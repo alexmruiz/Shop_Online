@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>AdminLTE 3 | Dashboard </title>
+  <title>{{ $title ?? config('app.name')}}</title>
 
   @include('components.layouts.partials.styles')
 
@@ -32,8 +32,7 @@
     <!-- Main content -->
     <section class="content">
       <div class="container-fluid">
-        {{ $slot }}
-        
+        {{ $slot }}      
         <!-- /.row -->
       </div><!--/. container-fluid -->
     </section>
@@ -52,6 +51,40 @@
 @include('components.layouts.partials.scripts')
 
 <!-- PLUGINS -->
+<script>
+  document.addEventListener('livewire:init', () => {
+      Livewire.on('close-modal', (idModal) => {
+          $('#' + idModal).modal('hide');
+      });
+  });
 
+  document.addEventListener('livewire:init', () => {
+      Livewire.on('open-modal', (idModal) => {
+          $('#' + idModal).modal('show');
+      });
+  });
+
+  document.addEventListener('livewire:init', () => {
+      Livewire.on('delete', (e) => {
+        //alert(e.id+ '-' + e.eventName)
+          Swal.fire({
+              title: "Estas seguro?",
+              text: "Esta acción no se puede revertir!",
+              icon: "warning",
+              showCancelButton: true,
+              confirmButtonColor: "#3085d6",
+              cancelButtonColor: "#d33",
+              confirmButtonText: "Si, eliminar!",
+              cancelButtonText: 'Cancelar'
+          }).then((result) => {
+              if (result.isConfirmed) {
+                Livewire.dispatch(e.eventName, { id: e.id });
+
+              }
+          });
+
+      });
+  });
+</script>
 </body>
 </html>

@@ -25,19 +25,19 @@
                with font-awesome or any other icon font library -->
 
                <li class="nav-item">
-                <a href="pages/widgets.html" class="nav-link">
+                <a href="{{route('dashboard')}}" class="nav-link">
                     <i class="nav-icon fas fa-home"></i>
                     <p>Inicio</p>
                 </a>
             </li>
             <li class="nav-item">
-                <a href="pages/widgets.html" class="nav-link">
+                <a href="{{route('category')}}" class="nav-link">
                     <i class="nav-icon fas fa-th-list"></i>
                     <p>Categorías</p>
                 </a>
             </li>
             <li class="nav-item">
-                <a href="pages/widgets.html" class="nav-link">
+                <a href="{{route('product')}}" class="nav-link">
                     <i class="nav-icon fas fa-box"></i>
                     <p>Productos</p>
                 </a>
