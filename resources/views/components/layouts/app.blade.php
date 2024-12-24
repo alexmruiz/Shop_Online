@@ -32,6 +32,7 @@
     <!-- Main content -->
     <section class="content">
       <div class="container-fluid">
+        @livewire('message')
         {{ $slot }}      
         <!-- /.row -->
       </div><!--/. container-fluid -->

@@ -8,6 +8,14 @@ use Livewire\WithPagination;
 use App\Models\Category;
 use Livewire\Attributes\On;
 
+/**
+ * Componente Livewire para gestionar las categorías.
+ * 
+ * Este componente permite listar, crear, editar y eliminar categorías.
+ * Integra paginación y búsqueda, y utiliza eventos Livewire para interactuar
+ * con el frontend.
+ */
+
 #[Title('Categorias')]
 class CategoryComponent extends Component
 {
@@ -23,12 +31,13 @@ class CategoryComponent extends Component
     
     public function render()
     {
+        // Reinicia la paginación si no hay búsqueda activa
         if($this->search==''){
             $this->resetPage();
         }
 
         $this->dispatch('open-modal', 'modalProduct');
-
+        // Filtra las categorías por el nombre y realiza la paginación
         $this->totalRegistros = Category::count();
         $categories = Category::where('name', 'like', '%'.$this->search.'%')
                         ->orderBy('id', 'desc') 
@@ -45,6 +54,7 @@ class CategoryComponent extends Component
        
     }
 
+    //Abre el modal
     public function create(){
 
         $this->Id=0;
@@ -54,8 +64,13 @@ class CategoryComponent extends Component
         $this->dispatch('open-modal', 'modalCategory');
     }
 
+     /**
+     * Guarda una nueva categoría en la base de datos.
+     * 
+     * Valida los datos antes de guardarlos y notifica al usuario del resultado.
+     */
     public function store(){
-        //dd(1);
+        
         $rules = [
             'name' => 'required|min:5|max:255|unique:categories'
         ];
@@ -78,6 +93,11 @@ class CategoryComponent extends Component
         $this->reset(['name']);
     }
 
+        /**
+     * Abre el modal para editar una categoría existente.
+     * 
+     * @param Category $category Instancia del modelo de categoría a editar
+     */
     public function edit(Category $category){
 
         $this->reset(['name']);
@@ -88,6 +108,11 @@ class CategoryComponent extends Component
         $this->dispatch('open-modal', 'modalCategory');
     }
 
+        /**
+     * Actualiza los datos de una categoría existente.
+     * 
+     * @param Category $category Instancia del modelo a actualizar
+     */
     public function update(Category $category){
 
         $rules = [
@@ -111,6 +136,11 @@ class CategoryComponent extends Component
         $this->reset(['name']);
     }
     
+        /**
+     * Elimina una categoría de la base de datos.
+     * 
+     * @param int $id ID de la categoría a eliminar
+     */
     #[On('destroyCategory')]
     public function destroy($id)
     {

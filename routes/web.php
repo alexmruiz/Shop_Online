@@ -23,4 +23,4 @@ require __DIR__.'/auth.php';
 Route::get('/categorias', CategoryComponent::class)->name('category');
 Route::get('/productos', ProductComponent::class)->name('product');
 Route::get('/ver_categoria/{category}', CategoryShow::class)->name('categoryShow');
-Route::get('/ver_producto', ProductShow::class)->name('productShow');
+Route::get('/ver_producto/{product}', ProductShow::class)->name('productShow');

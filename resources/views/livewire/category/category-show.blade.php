@@ -15,40 +15,39 @@
                         <li class="list-group-item">
                             <b>Productos</b> <a class="float-right">{{count($category->products)}}</a>
                         </li>
-                        <li class="list-group-item">
-                            <b>Articulos</b> <a class="float-right">0</a>
-                        </li>
                     </ul>
                 </div>
             
             </div>
         </div>
-        {{-- <div class="col-md-8">
+        @if ($category->products->isNotEmpty())
+        <div class="col-md-8">
             <div class="table-responsive">
                 <table class="table text-center">
                     <thead>
                         <tr>
                             <th>ID</th>
-                            <th>Imagen</th>
                             <th>Producto</th>
-                            <th>Precio de venta</th>
-                            <th>Stock</th>
+                            <th>Precio</th>
                         </tr>
                     </thead>
                     <tbody>
-                        @foreach ($category->products as $product)
+                        @forelse ($category->products as $product)
                         <tr>
-                            <td>{{$product->id}}</td>
-                            <td><x-image :item="$product"/></td>
-                            <td>{{$product->name}}</td>
-                            <td>{!! $product->precio !!}</td>
-                            <td>{!! $product->stockLabel !!}</td>
+                            <td>{{ $product->id }}</td>
+                            <td>{{ $product->name }}</td>
+                            <td>{!! $product->price !!}</td>
                         </tr>
-                        @endforeach
+                        @empty
+                        <tr class="text-center">
+                            <td colspan="3">Sin registros</td>
+                        </tr>
+                        @endforelse
                     </tbody>
                 </table>
             </div>
-        </div> --}}
+        </div>
+        @endif
     </div>
 
 </x-card>
