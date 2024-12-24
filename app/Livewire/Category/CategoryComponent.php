@@ -12,6 +12,7 @@ use Livewire\Attributes\On;
 class CategoryComponent extends Component
 {
     use WithPagination;
+    protected $paginationTheme = 'bootstrap';
     //Propiedades de la clase
     public $totalRegistros=0;
     public $search='';

@@ -50,7 +50,7 @@
         </x-table>
         <x-slot:cardFooter>
             {{$categories->links()}}
-        </x-slot:cardFooter>
+        </x-slot>
     </x-card>
 
     <x-modal modalId="modalCategory" modalTitle="Categorías">
