@@ -30,7 +30,7 @@
       <li class="nav-item dropdown user-menu">
         <a href="#" class="nav-link dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
           <img src="{{ asset('assets/dist/img/avatar5.png') }}" class="user-image img-circle elevation-2" alt="User Image">
-          <span class="d-none d-md-inline">Name</span>
+          <span class="d-none d-md-inline">{{ Auth::user()->name }}</span>
         </a>
         <ul class="dropdown-menu dropdown-menu-lg dropdown-menu-right" style="left: inherit; right: 0px;">
           <!-- User image -->
@@ -38,8 +38,7 @@
             <img src="{{ asset('assets/dist/img/avatar5.png') }}" class="img-circle elevation-2" alt="User Image">
   
             <p>
-              Name
-              <small>Cargo</small>
+              {{ Auth::user()->name }}
             </p>
           </li>
           <!-- Menu Body -->
@@ -47,7 +46,7 @@
           <!-- Menu Footer-->
           <li class="user-footer">
             <a class="btn btn-default btn-flat">Perfil</a>
-           {{-- <a class="btn btn-default btn-flat float-right" href="{{ route('logout') }}"
+           <a class="btn btn-default btn-flat float-right" href=""
             onclick="event.preventDefault();
                           document.getElementById('logout-form').submit();">
              Salir
@@ -55,7 +54,7 @@
   
          <form id="logout-form" action="{{ route('logout') }}" method="POST" class="d-none">
              @csrf
-         </form>--}}
+         </form>
           </li>
         </ul>
       </li>
