@@ -8,8 +8,10 @@ use App\Livewire\Home\Inicio;
 use App\Livewire\Category\CategoryShow;
 use App\Livewire\Client\ClientComponent;
 use App\Livewire\Product\ProductShow;
+use App\Livewire\Product\PublicProducts;
 
-Route::view('/', 'welcome');
+//Route::view('/', 'welcome');
+Route::get('/', PublicProducts::class)->name('home');
 
 Route::get('/dashboard',  Inicio::class)
     ->middleware(['auth', 'verified'])
@@ -21,7 +23,9 @@ Route::view('profile', 'profile')
 
 require __DIR__.'/auth.php';
 
-/*Ruta LogOut*/
+Route::middleware('auth')->group(function () {
+
+/*Ruta Logout*/
 Route::post('/logout', function () {
     Auth::logout();
     return redirect('/');
@@ -38,4 +42,5 @@ Route::get('/ver_producto/{product}', ProductShow::class)->name('productShow');
 /*Ruta Clientes*/
 Route::get('/clientes', ClientComponent::class)->name('client');
 
+});
 

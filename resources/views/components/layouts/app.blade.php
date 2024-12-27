@@ -25,8 +25,10 @@
 
   <!-- Content Wrapper. Contains page content -->
   <div class="content-wrapper">
+    @auth
     <!-- Content Header (Page header) -->
     @include('components.layouts.partials.content-header')
+    @endauth
     <!-- /.content-header -->
 
     <!-- Main content -->

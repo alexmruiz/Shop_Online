@@ -1,6 +1,7 @@
   <!-- Navbar -->
   <nav class="main-header navbar navbar-expand navbar-dark">
     <!-- Left navbar links -->
+    @auth
     <ul class="navbar-nav">
       <li class="nav-item">
         <a class="nav-link" data-widget="pushmenu" href="#" role="button"><i class="fas fa-bars"></i></a>
@@ -8,12 +9,16 @@
       <li class="nav-item d-none d-sm-inline-block">
         <a href="#" class="nav-link">Home</a>
       </li>
+      @endauth
 
     </ul>
-
+    @if (Route::has('login'))
+    <livewire:welcome.navigation />
+    @endif
     <!-- Right navbar links -->
     <ul class="navbar-nav ml-auto">
       <!-- Navbar Search -->
+      @auth
       <li class="nav-item">
           <form action="simple-results.html">
             <div class="input-group">
@@ -26,7 +31,7 @@
             </div>
         </form>
       </li>
-
+      
       <li class="nav-item dropdown user-menu">
         <a href="#" class="nav-link dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
           <img src="{{ asset('assets/dist/img/avatar5.png') }}" class="user-image img-circle elevation-2" alt="User Image">
@@ -58,7 +63,8 @@
           </li>
         </ul>
       </li>
-
+      @endauth
+     
       <li class="nav-item">
         <a class="nav-link" data-widget="fullscreen" href="#" role="button">
           <i class="fas fa-expand-arrows-alt"></i>
