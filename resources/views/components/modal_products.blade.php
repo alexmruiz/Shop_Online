@@ -35,7 +35,7 @@
                 @enderror
             </div>
             {{--Input precio--}}
-            <div class="form-group col-md-4">
+            <div class="form-group col-md-6">
                 <label for="price">Precio:</label>
                 <input wire:model='price' min="0" type="number" step="any" class="form-control" id="price" 
                 placeholder="Precio">
@@ -43,8 +43,18 @@
                     <div class="alert alert-danger w-100 mt-2">{{$message}}</div>
                 @enderror
             </div>         
+             {{--Input imagen--}}
+             <div class="form-group col-md-6">
+
+                <label for="image">Imagen</label>
+                <input wire:model='image' type="file" id="image" accept="image/">
+                
+                @error('image')
+                    <div class="alert alert-danger w-100 mt-2">{{$message}}</div>
+                @enderror
+            </div> 
             {{--Checkbox is_active--}}
-            <div class="form-group col-md-4">
+            <div class="form-group col-md-3">
                 <div class="icheck-primary">
                     <input wire:model='is_active' type="checkbox" id="is_active" checked>
                     <label for="is_active">¿Está activo?</label>
@@ -53,6 +63,17 @@
                     <div class="alert alert-danger w-100 mt-2">{{$message}}</div>
                 @enderror
             </div> 
+
+            {{--Imagen
+            <div class="form-group col-md-6">
+                @if($Id>0)
+                    <x-image :item="$product=App\Models\Product::find($Id)" float="float-right" size="150"/>
+                @endif
+
+                @if ($this->image)
+                       <img src="{{$image->temporaryURL()}}" width="200" alt="" class="rounded float right">    
+                @endif 
+            </div> --}}
         </div>
         <hr>
         <button wire:loading.attr='disabled' class="btn btn-primary float-right">{{$Id==0 ? 'Guardar' : 'Editar'}}</button>

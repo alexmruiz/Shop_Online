@@ -10,8 +10,10 @@ use App\Livewire\Client\ClientComponent;
 use App\Livewire\Product\ProductShow;
 use App\Livewire\Product\PublicProducts;
 
-//Route::view('/', 'welcome');
-Route::get('/', PublicProducts::class)->name('home');
+//Route::get('/', PublicProducts::class)->name('home');
+Route::get('/', function(){
+    return view('components.layouts.public_access');
+})->name('home');
 
 Route::get('/dashboard',  Inicio::class)
     ->middleware(['auth', 'verified'])

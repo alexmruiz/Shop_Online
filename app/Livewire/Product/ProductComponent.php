@@ -9,11 +9,13 @@ use Livewire\Attributes\Computed;
 use Livewire\WithPagination;
 use App\Models\Category;
 use Livewire\Attributes\On;
+use Livewire\WithFileUploads;
 
 #[Title('Productos')]
 class ProductComponent extends Component
 {
-    use WithPagination; // Habilita la paginación en el componente
+    use WithPagination, WithFileUploads;
+
     protected $paginationTheme = 'bootstrap'; // Configura el tema de paginación a Bootstrap
    
     // Propiedades de la clase
@@ -28,6 +30,7 @@ class ProductComponent extends Component
     public $description;
     public $price;
     public $is_active = 1;
+    public $image;
 
     // Renderiza la vista del componente
     public function render()
@@ -63,6 +66,7 @@ class ProductComponent extends Component
             'description' => 'max:255',
             'price' => 'required|numeric',
             'category_id' => 'required|numeric',
+            'image' => 'image|max:1024|nullable',
         ];
     
         $messages = [
@@ -74,11 +78,20 @@ class ProductComponent extends Component
             'price.numeric' => 'El precio debe ser un número.',
             'category_id.required' => 'La categoría es obligatoria.',
             'category_id.numeric' => 'La categoría debe ser un número válido.',
+            'image.image' => 'El archivo debe ser una imagen.',
+            'image.max' => 'La imagen no puede exceder los 1024KB.',
         ];
     
         $this->validate($rules, $messages);
 
         $product = new Product();
+
+         if($this->image){
+            $customName = uniqid().'.'.$this->image->extension();
+            $path = $this->image->storeAs("images/products/$customName");
+            $product->image = $path;
+         }
+
         $product->name = $this->name;
         $product->description = $this->description;
         $product->price = $this->price;
@@ -101,6 +114,7 @@ class ProductComponent extends Component
         $this->price = $product->price;
         $this->is_active = $product->is_active;
         $this->category_id = $product->category_id;
+        $this->image = $product->image;
 
         $this->dispatch('open-modal', 'modalProduct');
     }
@@ -109,10 +123,11 @@ class ProductComponent extends Component
     public function update(Product $product)
     {
         $rules = [
-            'name' => 'required|min:5|max:255|unique:products',
+            'name' => "required|min:5|max:255|unique:products,name,{$product->id}",
             'description' => 'max:255',
             'price' => 'required|numeric',
             'category_id' => 'required|numeric',
+            'image' => 'image|max:1024|nullable',
         ];
     
         $messages = [
@@ -121,19 +136,29 @@ class ProductComponent extends Component
             'name.max' => 'El nombre no puede exceder los 255 caracteres.',
             'name.unique' => 'El nombre ya está registrado en las categorías.',
             'description.max' => 'La descripción no puede exceder los 255 caracteres.',
-            'price.numeric' => 'El precio de compra debe ser un número.',
+            'price.numeric' => 'El precio debe ser un número.',
             'category_id.required' => 'La categoría es obligatoria.',
             'category_id.numeric' => 'La categoría debe ser un número válido.',
+            'image.image' => 'El archivo debe ser una imagen.',
+            'image.max' => 'La imagen no puede exceder los 1024KB.',
         ];
 
         $this->validate($rules, $messages);
 
-        $product->name = $this->name;
-        $product->description = $this->description;
-        $product->price = $this->price;
-        $product->category_id = $this->category_id;
-        $product->is_active = $this->is_active;
-        $product->update();
+        if($this->image){
+            $customName = uniqid().'.'.$this->image->extension();
+            $path = $this->image->storeAs("images/products/$customName", 'public');
+            $product->image = $path;
+         }
+
+         $product->update([
+            'name' => $this->name,
+            'description' => $this->description,
+            'price' => $this->price,
+            'category_id' => $this->category_id,
+            'is_active' => $this->is_active,
+            'image' => $product->image,
+        ]);
 
         $this->dispatch('close-modal', 'modalProduct');
         $this->dispatch('msg', 'Producto editado correctamente');

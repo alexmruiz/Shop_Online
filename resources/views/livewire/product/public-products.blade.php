@@ -2,22 +2,20 @@
     <x-card cardTitle="Sistema de Ventas">
         <!-- Barra de herramientas -->
         <div class="d-flex justify-content-between align-items-center mb-4">
-  
             <!-- Buscador -->
             <div class="input-group w-50">
-                <input type="text" wire:model.live='search' class="form-control" placeholder="Buscar...">   
+                <span class="input-group-text"><i class="fas fa-search"></i></span>
+                <input type="text" wire:model.live='search' class="form-control" placeholder="Buscar...">
             </div>
-
-           <!-- Filtro por categoría -->
+            <!-- Filtro por categoría -->
             <div class="form-group">
                 <select class="form-select" wire:model.live="selectedCategory">
                     <option value="">Todas las categorías</option>
-                    @foreach($categories as $category)
+                    @foreach ($categories as $category)
                         <option value="{{ $category->id }}">{{ $category->name }}</option>
                     @endforeach
                 </select>
             </div>
-
             <!-- Selector de resultados por página -->
             <div class="form-group">
                 <select class="form-select" wire:model.live='cant'>
@@ -30,29 +28,45 @@
 
         <!-- Lista de productos -->
         <div class="row">
-            @foreach($products as $product)
+            @if ($products->isEmpty())
+                <div class="col-12">
+                    <div class="alert alert-warning text-center" role="alert">
+                        Categoría sin productos
+                    </div>
+                </div>
+            @else
+                @foreach ($products as $product)
                 <div class="col-md-4 mb-4">
-                    <div class="card h-100 shadow-sm">
-                        {{-- <img src="path/to/product-image.jpg" class="card-img-top" alt="{{ $product->name }}"> --}}
-                        <div class="card-body d-flex flex-column">
-                            <h5 class="card-title">{{ $product->name }}</h5>
-                            <p class="card-text">{{ $product->description }}</p>
-                            <p class="card-text font-weight-bold">{{ $product->price }} €</p>
-                            <div class="mt-auto">
-                                <a href="#" class="btn btn-primary">
-                                    <i class="fas fa-shopping-cart"></i> Añadir al carrito
-                                </a>
+                    <div class="card h-100 shadow rounded-3">
+                        <div class="row g-0">
+                            <!-- Columna de imagen del producto -->
+                            <div class="col-md-4 p-0">
+                                <x-image-product :product="$product" class="card-img-top h-100 w-100 object-fit-cover" />
+                            </div>
+                
+                            <!-- Columna de texto: Nombre, descripción y precio -->
+                            <div class="col-md-8">
+                                <div class="card-body d-flex flex-column text-center h-100">
+                                    <h5 class="card-title text-dark fw-bold">{{ $product->name }}</h5>
+                                    <p class="card-text text-muted">{{ $product->description }}</p>
+                                    <p class="card-text font-weight-bold text-primary">{{ $product->price }} €</p>
+                                    <div class="mt-auto">
+                                        <a href="#" class="btn btn-primary w-100">
+                                            <i class="fas fa-shopping-cart"></i> Añadir al carrito
+                                        </a>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
-            @endforeach
+                @endforeach
+            @endif
         </div>
-        
 
         <!-- Paginación -->
         <x-slot:cardFooter>
-            {{$products->links()}}
-        </x-slot>
+            {{ $products->links() }}
+        </x-slot:cardFooter>
     </x-card>
 </div>

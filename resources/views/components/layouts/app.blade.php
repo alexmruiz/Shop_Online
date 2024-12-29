@@ -19,10 +19,8 @@
   <!-- Navbar -->
   @include('components.layouts.partials.navbar')
   <!-- /.navbar -->
-
   <!-- Main Sidebar Container -->
   @include('components.layouts.partials.sidebar')
-
   <!-- Content Wrapper. Contains page content -->
   <div class="content-wrapper">
     @auth

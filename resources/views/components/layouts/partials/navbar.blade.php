@@ -13,7 +13,7 @@
 
     </ul>
     @if (Route::has('login'))
-    <livewire:welcome.navigation />
+      <livewire:welcome.navigation />
     @endif
     <!-- Right navbar links -->
     <ul class="navbar-nav ml-auto">
