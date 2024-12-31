@@ -5,8 +5,8 @@
         <p>Nos alegra verte nuevamente. ¿Qué quieres hacer hoy?</p>
         
         <!-- Acciones rápidas -->
-        <div class="quick-actions my-4">         
-          {!! $createButtonHtml !!} 
+        <div class="quick-actions my-4">          
+          <a href="{{ route('product') }}" class="btn btn-primary"><i class="fas fa-box"></i> Ir a productos</a>
           <a href="{{ route('client') }}" class="btn btn-secondary"><i class="fas fa-user"></i> Ver Clientes</a>
           <a href="#" class="btn btn-warning"><i class="fas fa-chart-line"></i> Generar Reportes</a>
         </div>
@@ -38,7 +38,6 @@
           <i class="fas fa-info-circle"></i> ¡Recuerda actualizar tus datos para mejorar tu experiencia!
         </div>
       </div>
-      @include('components.modal_products')
       
     
 </div>

@@ -13,11 +13,7 @@ use App\Livewire\Product\PublicProducts;
 //Route::get('/', PublicProducts::class)->name('home');
 Route::get('/', function(){
     return view('components.layouts.public_access');
-})->name('home');
-
-Route::get('/dashboard',  Inicio::class)
-    ->middleware(['auth', 'verified'])
-    ->name('dashboard');
+})->name('start');
 
 Route::view('profile', 'profile')
     ->middleware(['auth'])
@@ -25,24 +21,36 @@ Route::view('profile', 'profile')
 
 require __DIR__.'/auth.php';
 
-Route::middleware('auth')->group(function () {
-
-/*Ruta Logout*/
 Route::post('/logout', function () {
     Auth::logout();
     return redirect('/');
 })->name('logout');
 
-/*Ruta Categorias*/
-Route::get('/categorias', CategoryComponent::class)->name('category');
-Route::get('/ver_categoria/{category}', CategoryShow::class)->name('categoryShow');
+// Usuario rol: 'admin'
+Route::middleware(['auth'])->group(function () {
 
-/*Ruta Productos*/
-Route::get('/productos', ProductComponent::class)->name('product');
-Route::get('/ver_producto/{product}', ProductShow::class)->name('productShow');
-
-/*Ruta Clientes*/
-Route::get('/clientes', ClientComponent::class)->name('client');
-
+    Route::get('/dashboard', Inicio::class)->name('dashboard');
+    //Logout
+    Route::post('/logout', function () {
+        Auth::logout();
+        return redirect('/');
+    })->name('logout');
+    // Categorías
+    Route::get('/categorias', CategoryComponent::class)->name('category');
+    Route::get('/ver_categoria/{category}', CategoryShow::class)->name('categoryShow');
+    // Productos
+    Route::get('/productos', ProductComponent::class)->name('product');
+    Route::get('/ver_producto/{product}', ProductShow::class)->name('productShow');
+    // Clientes
+    Route::get('/clientes', ClientComponent::class)->name('client');
 });
 
+// Usuarios autenticados rol: 'user'
+Route::middleware(['auth'])->group(function () {
+
+    // Inicio clientes
+    Route::get('/home', function () {
+        return view('components.layouts.public_access');
+    })->name('home');
+
+});

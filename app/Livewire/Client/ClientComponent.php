@@ -2,12 +2,10 @@
 
 namespace App\Livewire\Client;
 
-use App\Models\Client;
+use App\Models\User;
 use Livewire\Component;
 use Livewire\Attributes\Title;
-use Livewire\Attributes\Computed;
 use Livewire\WithPagination;
-use App\Models\Category;
 use Livewire\Attributes\On;
 
 #[Title('Clientes')]
@@ -23,25 +21,33 @@ class ClientComponent extends Component
     //Propiedades modelo
     public $Id=0; 
     public $name;
-     public $email;
-     public $phone;
-     public $address;
+    public $email;
+    public $password;
+    public $confirmpassword;
+    public $role;
+
+    public $selectedUser;
    
     public function render()
     {
-        $this->totalRegistros = Client::count();
-        $clients = Client::where('name', 'like', '%'.$this->search.'%')
-        ->orderBy('id', 'desc') 
-        ->paginate($this->cant);
-        return view('livewire.client.client-component', [
-            'clients' => $clients
-        ]);
-    }
+        $query = User::query();
 
-    #[Computed()]
-    public function categories()
-    {
-        return Category::all();
+        if (!empty($this->selectedUser)) {
+            $query->where('role', $this->selectedUser);
+        }
+        
+        $this->totalRegistros = $query->count();
+        
+        $users = $query
+            ->where('name', 'like', '%' . $this->search . '%')
+            ->orderBy('id', 'desc')
+            ->paginate($this->cant);
+
+            $roles = User::select('role')->distinct()->pluck('role');
+            return view('livewire.client.client-component', [
+                'users' => $users,
+                'roles' => $roles,
+            ]);
     }
 
     public function create(){
@@ -56,114 +62,124 @@ class ClientComponent extends Component
     public function store(){
         
         $rules = [
-            'name' => 'required|min:5|max:255|unique:clients,name', // El campo 'name' es obligatorio, tiene una longitud mínima de 5, máxima de 255 y debe ser único en la tabla 'clients'.
-            'email' => 'nullable|email|max:255|unique:clients,email', // El campo 'email' es opcional, debe ser un correo válido y único.
-            'phone' => 'required|numeric|digits_between:10,15', // El campo 'phone' es obligatorio, debe ser numérico y tener entre 10 y 15 dígitos.
-            'address' => 'required|string|max:255', // El campo 'address' es obligatorio, debe ser una cadena de texto con un máximo de 255 caracteres.
-        ];
-        
+            'name' => 'required|min:5|max:255', 
+            'email' => 'required|email|max:255|unique:users,email', 
+            'password' => 'required|min:6', 
+            'confirmpassword' => 'required|same:password',
+            'role' => 'required', 
+        ];       
         $messages = [
-            'name.required' => 'El nombre del cliente es obligatorio.',
+            'name.required' => 'El nombre del usuario es obligatorio.',
             'name.min' => 'El nombre debe tener al menos 5 caracteres.',
             'name.max' => 'El nombre no puede exceder los 255 caracteres.',
             'name.unique' => 'El nombre ya está registrado en nuestra base de datos.',
             
+            'email.required' => 'El correo electrónico es obligatorio',
             'email.email' => 'El correo electrónico debe ser una dirección válida.',
             'email.max' => 'El correo electrónico no puede exceder los 255 caracteres.',
             'email.unique' => 'El correo electrónico ya está registrado en nuestra base de datos.',
             
-            'phone.required' => 'El teléfono es obligatorio.',
-            'phone.numeric' => 'El teléfono debe contener solo números.',
-            'phone.digits_between' => 'El teléfono debe tener entre 10 y 15 dígitos.',
+            'password.required' => 'La contraseña es obligatoria',
+            'password.min'=> 'La contraseña debe de contener 6 caracteres mínimo',
+
+            'confirmpassword.required' => 'La confirmación de contraseña es obligatoria.',
+            'confirmpassword.same' => 'La confirmación de contraseña debe coincidir con la contraseña.',
             
-            'address.required' => 'La dirección es obligatoria.',
-            'address.string' => 'La dirección debe ser un texto válido.',
-            'address.max' => 'La dirección no puede exceder los 255 caracteres.',
+            'role.required' => 'Debes elegir un rol.',
         ];
         
     
         $this->validate($rules, $messages);
 
-        $client = new Client();
+        $user = new User();
         
-        $client->name = $this->name;
-        $client->email = $this->email;
-        $client->phone = $this->phone;
-        $client->address = $this->address;
-        $client->save();
+        $user->name = $this->name;
+        $user->email = $this->email;
+        $user->password = bcrypt($this->password);
+        $user->role = $this->role;
+        $user->save();
 
         $this->dispatch('close-modal', 'modalClient');
         $this->dispatch('msg', 'Cliente creado correctamente');
         $this->clean();
     }
 
-    public function edit(Client $client){
+    public function edit(User $user){
 
         $this->clean();
-        $this->Id = $client->id;
-        $this->name = $client->name;
-        $this->email = $client->email;
-        $this->phone = $client->phone;
-        $this->address = $client->address;
+        $this->Id = $user->id;
+        $this->name = $user->name;
+        $this->email = $user->email;
+        $this->role = $user->role;
 
         $this->dispatch('open-modal', 'modalClient');
     }
 
-    public function update(Client $client){
-        
+    public function update(User $user)
+    {
         $rules = [
-            'name' => 'required|min:5|max:255',
-            'email' => 'required|email|max:255|unique:clients,email,' . $client->id, 
-            'phone' => 'required|numeric|min:9', 
-            'address' => 'required|string|max:255',
+            'name' => 'sometimes|required|min:5|max:255|unique:users,name,' . $user->id, // Excluye al usuario actual
+            'email' => 'sometimes|required|email|max:255|unique:users,email,' . $user->id, // Excluye al usuario actual
+            'password' => 'sometimes|required|min:6', // Contraseña opcional durante la edición
+            'confirmpassword' => 'sometimes|required|same:password', // Opcional, pero debe coincidir si se proporciona
+            'role' => 'sometimes|required|string|max:255',
         ];
     
         $messages = [
-            'name.required' => 'El nombre del cliente es obligatorio.',
+            'name.required' => 'El nombre del usuario es obligatorio.',
             'name.min' => 'El nombre debe tener al menos 5 caracteres.',
             'name.max' => 'El nombre no puede exceder los 255 caracteres.',
-            
+            'name.unique' => 'El nombre ya está registrado en nuestra base de datos.',
+    
             'email.required' => 'El correo electrónico es obligatorio.',
             'email.email' => 'El correo electrónico debe ser una dirección válida.',
             'email.max' => 'El correo electrónico no puede exceder los 255 caracteres.',
             'email.unique' => 'El correo electrónico ya está registrado en nuestra base de datos.',
+            
+            'password.require' => 'La contraseña es obligatoria',
+            'password.min' => 'La contraseña debe contener al menos 6 caracteres.',
+            'confirmpassword.same' => 'La confirmación de contraseña no coincide con la nueva contraseña.',
     
-            'phone.required' => 'El teléfono es obligatorio.',
-            'phone.numeric' => 'El teléfono debe contener solo números.',
-            'phone.min' => 'Minimo 9 números',
-    
-            'address.required' => 'La dirección es obligatoria.',
-            'address.string' => 'La dirección debe ser un texto válido.',
-            'address.max' => 'La dirección no puede exceder los 255 caracteres.',
+            'role.required' => 'Debes elegir un rol.',
         ];
-
+    
         $this->validate($rules, $messages);
-
-        $client -> name = $this->name;
-        $client -> email = $this->email;
-        $client -> phone = $this->phone;
-        $client -> address = $this->address;
-        $client->update();
-
+    
+        // Actualiza solo los campos modificados
+        if (isset($this->name)) {
+            $user->name = $this->name;
+        }
+        if (isset($this->email)) {
+            $user->email = $this->email;
+        }
+        if (!empty($this->password) && $this->password === $this->confirmpassword) {
+            $user->password = bcrypt($this->password);
+        }
+        if (isset($this->role)) {
+            $user->role = $this->role;
+        }
+    
+        $user->update();
+    
         $this->dispatch('close-modal', 'modalClient');
         $this->dispatch('msg', 'Cliente editado correctamente');
-
+    
         $this->clean();
     }
-
+    
     //Métdo encargado de la limpieza del modal
     public function clean()
     {
-        $this->reset(['Id', 'name', 'email', 'phone', 
-         'address']);
+        $this->reset(['Id', 'name', 'email', 'password', 'confirmpassword' ,
+         'role']);
         $this->resetErrorBag();
     }
 
     #[On('destroyClient')]
     public function destroy($id)
     {
-        $client = Client::findOrFail($id);
-        $client->delete();
+        $user = User::findOrFail($id);
+        $user->delete();
 
         $this->dispatch('msg', 'El cliente ha sido eliminado correctamente');
     }

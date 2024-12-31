@@ -6,6 +6,7 @@ use App\Livewire\Product\ProductComponent;
 use App\Models\Category;
 use App\Models\Client;
 use App\Models\Product;
+use App\Models\User;
 use Livewire\Attributes\Computed;
 use Livewire\Component;
 use Livewire\Attributes\Title;
@@ -20,7 +21,7 @@ class Inicio extends Component
     public function render()
     {
         $this->totalRegistrosProduct = Product::count();
-        $this->totalRegistrosClient = Client::count();
+        $this->totalRegistrosClient = User::where ('role', 'user')-> count();
 
         $productComponent = new ProductComponent();
         $createButtonHtml = $productComponent->renderCreateButton();

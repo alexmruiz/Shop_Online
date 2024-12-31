@@ -12,15 +12,25 @@ new #[Layout('layouts.guest')] class extends Component
     /**
      * Handle an incoming authentication request.
      */
-    public function login(): void
+     public function login(): void
     {
         $this->validate();
 
+        // Autenticar al usuario
         $this->form->authenticate();
 
+        // Obtener el usuario autenticado
+        $user = Auth::user();
+
+        // Regenerar la sesión
         Session::regenerate();
 
-        $this->redirectIntended(default: route('dashboard', absolute: false), navigate: true);
+        // Verificar el rol y redirigir
+        if ($user && trim($user->role) === 'admin') {
+            $this->redirect(route('dashboard'));  
+        } else {
+            $this->redirect(route('home')); 
+        }
     }
 }; ?>
 

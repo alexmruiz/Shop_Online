@@ -1,0 +1,12 @@
+body {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+  }
+  main {
+    flex: 1;
+  }
+  footer {
+    bottom: 0;
+    width: 100%;
+  }
