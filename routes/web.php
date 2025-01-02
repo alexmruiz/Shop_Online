@@ -1,5 +1,6 @@
 <?php
 
+use App\Livewire\Cart\CartComponent;
 use App\Livewire\Category\CategoryComponent;
 use App\Livewire\Product\ProductComponent;
 use Illuminate\Support\Facades\Auth;
@@ -11,9 +12,10 @@ use App\Livewire\Product\ProductShow;
 use App\Livewire\Product\PublicProducts;
 
 //Route::get('/', PublicProducts::class)->name('home');
-Route::get('/', function(){
-    return view('components.layouts.public_access');
-})->name('start');
+// Route::get('/', function(){
+//     return view('components.layouts.public_access');
+// })->name('start');
+Route::get('/', PublicProducts::class)->name('start');
 
 Route::view('profile', 'profile')
     ->middleware(['auth'])
@@ -25,6 +27,8 @@ Route::post('/logout', function () {
     Auth::logout();
     return redirect('/');
 })->name('logout');
+
+
 
 // Usuario rol: 'admin'
 Route::middleware(['auth'])->group(function () {
@@ -49,8 +53,9 @@ Route::middleware(['auth'])->group(function () {
 Route::middleware(['auth'])->group(function () {
 
     // Inicio clientes
-    Route::get('/home', function () {
-        return view('components.layouts.public_access');
-    })->name('home');
+    Route::get('/home', PublicProducts::class)->name('home');
+
+    //Cesta de la compra
+    Route::get('/cesta_compra', CartComponent::class)->name('cart');
 
 });

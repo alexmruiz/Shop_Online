@@ -1,5 +1,5 @@
 <div class="mt-4">
-    <x-card cardTitle="Sistema de Ventas">
+    <x-card cardTitle="Explora nuestros productos">
         <!-- Barra de herramientas -->
         <div class="d-flex justify-content-between align-items-center mb-4">
             <!-- Buscador -->
@@ -25,9 +25,12 @@
                 </select>
             </div>
         </div>
-
         <!-- Lista de productos -->
         <div class="row">
+            @guest
+                <h5 class="text-center fw-bold mt-4 mb-4">Para poder comprar es necesario registrarse</h5>
+            @endguest
+
             @if ($products->isEmpty())
                 <div class="col-12">
                     <div class="alert alert-warning text-center" role="alert">
@@ -36,30 +39,38 @@
                 </div>
             @else
                 @foreach ($products as $product)
-                <div class="col-md-4 mb-4">
-                    <div class="card h-100 shadow rounded-3">
-                        <div class="row g-0">
-                            <!-- Columna de imagen del producto -->
-                            <div class="col-md-4 p-0">
-                                <x-image-product :product="$product" class="card-img-top h-100 w-100 object-fit-cover" />
-                            </div>
-                
-                            <!-- Columna de texto: Nombre, descripción y precio -->
-                            <div class="col-md-8">
-                                <div class="card-body d-flex flex-column text-center h-100">
-                                    <h5 class="card-title text-dark fw-bold">{{ $product->name }}</h5>
-                                    <p class="card-text text-muted">{{ $product->description }}</p>
-                                    <p class="card-text font-weight-bold text-primary">{{ $product->price }} €</p>
+                    <div class="col-md-4 col-sm-6 mb-4">
+                        <div class="card h-100 shadow-sm border-0 rounded-3">
+                            <!-- Imagen del Producto -->
+                            <x-image-product :product="$product" class="card-img-top w-100 h-100 object-fit-cover"
+                                alt="Imagen de {{ $product->name }}" />
+
+                            <!-- Detalles del Producto -->
+                            <div class="card-body d-flex flex-column text-center">
+                                <h5 class="card-title text-dark fw-bold">{{ $product->name }}</h5>
+                                <p class="card-text text-muted small">
+                                    {{ Str::limit($product->description, 100, '...') }}</p>
+                                <p class="card-text fw-bold text-primary">{{ number_format($product->price, 2) }} €</p>
+
+                                <!-- Botón Añadir al Carrito -->
+                                @auth
                                     <div class="mt-auto">
-                                        <a href="#" class="btn btn-primary w-100">
+                                        <a href="#" wire:click.prevent="addToCart('{{ $product->id }}')"
+                                            class="btn btn-primary w-100">
                                             <i class="fas fa-shopping-cart"></i> Añadir al carrito
                                         </a>
                                     </div>
+                                @endauth
+                                @guest
+                                <div class="mt-auto">
+                                    <a href="{{ route('login') }}" class="btn btn-primary w-100">
+                                        <i class="fas fa-shopping-cart"></i> Añadir al carrito
+                                    </a>
                                 </div>
+                                @endguest                                
                             </div>
                         </div>
                     </div>
-                </div>
                 @endforeach
             @endif
         </div>

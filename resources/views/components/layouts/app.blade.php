@@ -6,7 +6,7 @@
   <title>{{ $title ?? config('app.name')}}</title>
 
   @include('components.layouts.partials.styles')
-
+  @livewireStyles
 </head>
 <body class="hold-transition dark-mode sidebar-mini layout-fixed layout-navbar-fixed layout-footer-fixed">
 <div class="wrapper">
@@ -87,5 +87,6 @@
       });
   });
 </script>
+@livewireScripts
 </body>
 </html>
