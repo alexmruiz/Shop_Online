@@ -15,6 +15,8 @@ use App\Livewire\Product\PublicProducts;
 // Route::get('/', function(){
 //     return view('components.layouts.public_access');
 // })->name('start');
+
+
 Route::get('/', PublicProducts::class)->name('start');
 
 Route::view('profile', 'profile')
@@ -31,14 +33,9 @@ Route::post('/logout', function () {
 
 
 // Usuario rol: 'admin'
-Route::middleware(['auth'])->group(function () {
+Route::middleware(['auth', 'role:admin'])->group(function () {
 
     Route::get('/dashboard', Inicio::class)->name('dashboard');
-    //Logout
-    Route::post('/logout', function () {
-        Auth::logout();
-        return redirect('/');
-    })->name('logout');
     // Categorías
     Route::get('/categorias', CategoryComponent::class)->name('category');
     Route::get('/ver_categoria/{category}', CategoryShow::class)->name('categoryShow');
@@ -50,7 +47,7 @@ Route::middleware(['auth'])->group(function () {
 });
 
 // Usuarios autenticados rol: 'user'
-Route::middleware(['auth'])->group(function () {
+Route::middleware(['auth', 'role:user'])->group(function () {
 
     // Inicio clientes
     Route::get('/home', PublicProducts::class)->name('home');

@@ -16,12 +16,12 @@ class CheckRole
      */
     public function handle(Request $request, Closure $next, $role): Response
     {
-        if (Auth::check() && Auth::user()->role === $role)
-        {
+        // Comprobar si el usuario está autenticado y tiene el rol adecuado
+        if (Auth::check() && Auth::user()->role === $role) {
             return $next($request);
         }
-        // Si el usuario no tiene el rol adecuado, redirigir 
-        return redirect('/')-> with('error', 'Acceso denegado');
-        
+
+        // Si no tiene el rol, redirigir al inicio con un mensaje de error
+        return redirect('/')->with('error', 'Acceso denegado');
     }
 }
