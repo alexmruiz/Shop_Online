@@ -1,4 +1,5 @@
 <div class="mt-4 mb-4">
+        
     <x-card cardTitle="Explora nuestros productos">
         <!-- Barra de herramientas -->
         <div class="d-flex justify-content-between align-items-center mb-4">
@@ -7,6 +8,17 @@
                 <span class="input-group-text"><i class="fas fa-search"></i></span>
                 <input type="text" wire:model.live='search' class="form-control" placeholder="Buscar...">
             </div>
+            
+            <!-- Botón de carrito -->
+            @auth
+            <a href="{{ route('cart') }}" class="btn btn-warning position-relative rounded-pill px-4 py-2 shadow-lg" aria-label="Ver carrito">
+                <i class="bi bi-cart fs-5"></i> Cesta de la compra
+                <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+                    {{$this->total}}
+                </span>
+            </a>
+            @endauth
+            
             <!-- Filtro por categoría -->
             <div class="form-group">
                 <select class="form-select" wire:model.live="selectedCategory">
@@ -16,6 +28,7 @@
                     @endforeach
                 </select>
             </div>
+            
             <!-- Selector de resultados por página -->
             <div class="form-group">
                 <select class="form-select" wire:model.live='cant'>
@@ -25,6 +38,22 @@
                 </select>
             </div>
         </div>
+        <div>
+            @if ($feedbackMessage)
+                <div 
+                    x-data="{ show: true }"
+                    x-show="show"
+                    id="flash-message"
+                    x-init="setTimeout(() => show = false, 6000); 
+                             $wire.set('feedbackMessage', null)"
+                    class="alert alert-success text-center fw-bold position-fixed top-0 start-50 translate-middle-x mt-3 shadow-lg"
+                    style="z-index: 1050; max-width: 90%;">
+                    {{ $feedbackMessage }}
+                </div>
+            @endif
+        </div>
+        
+        
         <!-- Lista de productos -->
         <div class="row">
             @guest
@@ -67,7 +96,7 @@
                                         <i class="fas fa-shopping-cart"></i> Añadir al carrito
                                     </a>
                                 </div>
-                                @endguest                                
+                                @endguest                                 
                             </div>
                         </div>
                     </div>

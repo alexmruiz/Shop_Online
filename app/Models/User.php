@@ -47,4 +47,9 @@ class User extends Authenticatable
         ];
     }
 
+    public function cart()
+    {
+        return $this->hasone(Cart::class);
+    }
+
 }

@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId('user_id')->constrained('users')->cascadeOnDelete();
             $table->string('order_number')->unique();
-            $table->string('address');
+            $table->string('address')->nullable();
             $table->string('status')->default('pending');
             $table->timestamps();
     });

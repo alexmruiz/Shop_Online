@@ -1,0 +1,29 @@
+body {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+  }
+  main {
+    flex: 1;
+  }
+  footer {
+    bottom: 0;
+    width: 100%;
+  }
+
+  .img-thumbnail {
+    width: 150px; /* Tamaño fijo, ajusta según tus necesidades */
+    height: 150px; /* Ajusta la altura para mantener la proporción */
+    object-fit: cover; /* Asegura que las imágenes se recorten correctamente y mantengan la proporción */
+    border-radius: 8px; /* Borde redondeado */
+    object-position: center; /* Centra la imagen dentro del contenedor */
+    display: block; /* Asegura que la imagen se muestre correctamente en línea */
+    margin-right: 15px; /* Espacio a la derecha (si se necesita) */
+    background-color: #f0f0f0; /* Fondo gris claro, útil para imágenes no cargadas */
+}
+
+/* Estilo para imágenes de "no disponible" */
+.img-thumbnail[alt="Imagen no disponible"] {
+    object-fit: contain; /* Ajusta la imagen para que se vea completamente sin recortarla */
+    background-color: #e0e0e0; /* Fondo gris más oscuro para imagen no disponible */
+}

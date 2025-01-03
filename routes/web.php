@@ -11,13 +11,6 @@ use App\Livewire\Client\ClientComponent;
 use App\Livewire\Product\ProductShow;
 use App\Livewire\Product\PublicProducts;
 
-//Route::get('/', PublicProducts::class)->name('home');
-// Route::get('/', function(){
-//     return view('components.layouts.public_access');
-// })->name('start');
-
-
-Route::get('/', PublicProducts::class)->name('start');
 
 Route::view('profile', 'profile')
     ->middleware(['auth'])
@@ -25,12 +18,14 @@ Route::view('profile', 'profile')
 
 require __DIR__.'/auth.php';
 
+//Inicio
+Route::get('/', PublicProducts::class)->name('start')->middleware('guest');
+
+//Logout
 Route::post('/logout', function () {
     Auth::logout();
     return redirect('/');
 })->name('logout');
-
-
 
 // Usuario rol: 'admin'
 Route::middleware(['auth', 'role:admin'])->group(function () {

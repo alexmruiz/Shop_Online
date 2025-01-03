@@ -12,8 +12,9 @@
 <body class="d-flex flex-column min-vh-100">
 
     @include('components.layouts.partials-public.header')
-
+    
     <main class="container flex-grow-1">
+        <x-flash-message/>
         {{ $slot }}
     </main>
 
@@ -21,7 +22,10 @@
     @include('components.layouts.partials-public.footer')
 
     @include('components.layouts.partials-public.scripts')
+
     @livewireScripts
+  
+    
 </body>
 
 </html>
