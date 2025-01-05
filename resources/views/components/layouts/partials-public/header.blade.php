@@ -41,7 +41,7 @@
                         </a>
                         <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userMenu">
                             <li><a class="dropdown-item" href="#">Perfil</a></li>
-                            <li><a class="dropdown-item" href="#">Configuración</a></li>
+                            <li><a class="dropdown-item" href="{{ route('myOrders') }}">Mis Pedidos</a></li>
                             <li>
                                 <hr class="dropdown-divider">
                             </li>

@@ -24,16 +24,19 @@
                            @if($product) 
                                 <x-image-product :product="$product" class="img-thumbnail me-3" /> 
                             @endif
+                            <!-- Información del producto -->
                             <div class="flex-grow-1">
                                 <h5 class="mb-1">{{ $item['name'] }}</h5>
                                 <small class="text-muted">Cantidad: {{ $item['quantity'] }}</small><br>
-                                <small class="text-muted">Precio Unitario: ${{ number_format($item['price'], 2) }}</small>
+                                <small class="text-muted">Precio Unitario: {{ number_format($item['price'], 2) }}€</small>
                             </div>
+                            <!-- Botones para modificar la cantidad -->
                             <div class="d-flex align-items-center">
                                 <button wire:click="decreaseQuantity('{{ $item['id'] }}')" class="btn btn-sm btn-outline-secondary me-2">-</button>
                                 <span>{{ $item['quantity'] }}</span>
                                 <button wire:click="increaseQuantity('{{ $item['id'] }}')" class="btn btn-sm btn-outline-secondary ms-2">+</button>
                             </div>
+                            <!-- Botón para elimnar -->
                             <button wire:click="removeFromCart('{{ $item['id'] }}')" class="btn btn-sm btn-outline-danger ms-3">
                                 <i class="bi bi-trash"></i>
                             </button>
@@ -43,9 +46,9 @@
 
                 <div class="d-flex justify-content-between align-items-center">
                     <h3 class="text-lg font-bold">Total: {{ number_format($total, 2) }}€</h3>
-                    <button wire:click="checkout" class="btn btn-primary">
+                    <a href="{{ route('checkout') }}" class="btn btn-primary">
                         <i class="bi bi-credit-card"></i> Proceder al pago
-                    </button>
+                    </a>                    
                 </div>
             @endif
         </div>
