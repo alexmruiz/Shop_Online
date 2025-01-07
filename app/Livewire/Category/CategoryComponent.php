@@ -31,12 +31,8 @@ class CategoryComponent extends Component
     
     public function render()
     {
-        // Reinicia la paginación si no hay búsqueda activa
-        if($this->search==''){
-            $this->resetPage();
-        }
 
-        $this->dispatch('open-modal', 'modalProduct');
+        //$this->dispatch('open-modal', 'modalProduct');
         // Filtra las categorías por el nombre y realiza la paginación
         $this->totalRegistros = Category::count();
         $categories = Category::where('name', 'like', '%'.$this->search.'%')

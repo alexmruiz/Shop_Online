@@ -8,11 +8,10 @@
     <div class="card card-solid">
         <div class="card-body">
             <div class="row">
-                <div class="col-12 col-sm-5">
-                    <div class="col-12">
-                        <x-image-product :product="$product" class="img-fluid rounded-3"/>
-                    </div>
+                <div class="col-12 col-sm-5 d-flex justify-content-center align-items-center">
+                    <x-image-product :product="$product" class="img-fluid rounded-3" />
                 </div>
+                
                 <div class="col-12 col-sm-7">
                     <h3 class="my-3">{{ $product->name }}</h3>
                     <p>{{ $product->description }}</p>

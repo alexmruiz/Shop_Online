@@ -36,9 +36,11 @@ class ProductComponent extends Component
     public function render()
     {
         $this->totalRegistros = Product::count(); // Cuenta el total de registros de productos
+
         $products = Product::where('name', 'like', '%'.$this->search.'%')
             ->orderBy('id', 'desc') 
             ->paginate($this->cant); // Paginación de productos según la búsqueda
+            
         return view('livewire.product.product-component', [
             'products' => $products
         ]);

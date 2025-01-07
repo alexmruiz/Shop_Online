@@ -110,6 +110,8 @@ class ClientComponent extends Component
         $this->Id = $user->id;
         $this->name = $user->name;
         $this->email = $user->email;
+        $this->password = $user->password;
+        $this->confirmpassword = $user->password;
         $this->role = $user->role;
 
         $this->dispatch('open-modal', 'modalClient');
@@ -118,16 +120,17 @@ class ClientComponent extends Component
     public function update(User $user)
     {
         $rules = [
-            'name' => 'sometimes|required|min:5|max:255|unique:users,name,' . $user->id, // Excluye al usuario actual
-            'email' => 'sometimes|required|email|max:255|unique:users,email,' . $user->id, // Excluye al usuario actual
-            'password' => 'sometimes|required|min:6', // Contraseña opcional durante la edición
-            'confirmpassword' => 'sometimes|required|same:password', // Opcional, pero debe coincidir si se proporciona
-            'role' => 'sometimes|required|string|max:255',
+            'name' => 'required|min:3|max:255',
+            'email' => "required|email|max:255", // Excluye al usuario actual
+            'password' => 'required|min:6', // Contraseña opcional durante la edición
+            'confirmpassword' => 'required|same:password', // Opcional, pero debe coincidir si se proporciona
+            'role' => 'required|string|max:255',
         ];
+        //unique:users,email,{$user->id}
     
         $messages = [
             'name.required' => 'El nombre del usuario es obligatorio.',
-            'name.min' => 'El nombre debe tener al menos 5 caracteres.',
+            'name.min' => 'El nombre debe tener al menos 3 caracteres.',
             'name.max' => 'El nombre no puede exceder los 255 caracteres.',
             'name.unique' => 'El nombre ya está registrado en nuestra base de datos.',
     
@@ -145,21 +148,12 @@ class ClientComponent extends Component
     
         $this->validate($rules, $messages);
     
-        // Actualiza solo los campos modificados
-        if (isset($this->name)) {
-            $user->name = $this->name;
-        }
-        if (isset($this->email)) {
-            $user->email = $this->email;
-        }
-        if (!empty($this->password) && $this->password === $this->confirmpassword) {
-            $user->password = bcrypt($this->password);
-        }
-        if (isset($this->role)) {
-            $user->role = $this->role;
-        }
-    
-        $user->update();
+        $user->update([
+            'name' => $this->name,
+            'email' => $this->email,
+            'password' => $this->password,
+            'role' => $this->role,
+        ]);
     
         $this->dispatch('close-modal', 'modalClient');
         $this->dispatch('msg', 'Cliente editado correctamente');

@@ -32,7 +32,9 @@ new #[Layout('layouts.guest')] class extends Component
 
         Auth::login($user);
 
-        $this->redirect(route('home', absolute: false), navigate: true);
+        session()->flash('success', 'Bienvenido, ' . Auth::user()->name . '!');
+
+        $this->redirect(route('home'));
 
     }
 }; ?>

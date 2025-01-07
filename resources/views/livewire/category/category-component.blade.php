@@ -14,7 +14,7 @@
                 <th width="3%">...</th>
                 <th width="3%">...</th>
                 <th width="3%">...</th>
-            </x-slot:thead>
+            </x-slot>
 
             @forelse ($categories as $category)
                 
