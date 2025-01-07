@@ -83,3 +83,37 @@ footer {
     justify-content: center;
     color: #7f8c8d; /* Texto gris para indicar imagen no cargada */
 }
+
+.breadcrumb {
+    background-color: #f8f9fa !important;
+    font-size: 0.9rem;
+}
+.breadcrumb-item a:hover {
+    color: #0d6efd;
+    transition: all 0.3s ease-in-out;
+}
+
+/* General */
+.cart-item {
+    border: 1px solid #e0e0e0;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+.cart-item:hover {
+    transform: scale(1.02);
+    box-shadow: 0px 10px 15px rgba(0, 0, 0, 0.1);
+}
+
+.list-group-item {
+    background-color: #f9f9f9;
+    border: none;
+}
+
+.badge {
+    padding: 0.4em 0.6em;
+    font-size: 0.9rem;
+}
+
+.alert {
+    text-align: center;
+    font-size: 1.1rem;
+}

@@ -16,6 +16,8 @@
 
     <!-- Main content -->
     <main class="container my-4 flex-grow-1">
+        <!-- Breadcrumb -->
+        <livewire:breadcrumb />
         <x-flash-message />
         <section class="content">
             {{ $slot }}

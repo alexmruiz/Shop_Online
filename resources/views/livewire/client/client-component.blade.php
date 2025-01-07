@@ -2,7 +2,7 @@
     <x-card cardTitle="Listado de Clientes ({{$this->totalRegistros}})">
         <x-slot:cardTools>
              <!-- Filtro por rol -->
-            <a href="#" class="btn btn-primary" wire:click='create'>
+            <a href="#" class="btn btn-primary float-end" wire:click='create'>
                 <i class="fas fa-plus-circle"></i>
                 Crear Usuario              
             </a>            
@@ -23,6 +23,7 @@
                 <th>Rol</th>
                 <th width="3%">...</th>
                 <th width="3%">...</th>
+                <th width="3%">...</th>
             </x-slot>
 
             @forelse ($users as $user)
@@ -36,11 +37,11 @@
 
                         <td>{{ $user->role }}</td>
                                          
-                       {{--   <td>
-                            <a href="{{route('productShow',$user)}}" class="btn btn-success bt-sm" title="Ver">
+                          <td>
+                            <a href="{{route('clientShow',$user)}}" class="btn btn-success bt-sm" title="Ver">
                                 <i class="far fa-eye"></i>
                             </a>
-                        </td>--}}
+                        </td>
                         <td>
                             <a href="#" wire:click="edit({{$user->id}})" class="btn btn-primary bt-sm" title="Editar">
                                 <i class="far fa-edit"></i>

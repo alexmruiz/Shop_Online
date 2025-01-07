@@ -1,5 +1,5 @@
 <div class="container mt-4">
-    <x-card cardTitle="Confirmación de Pedido">
+    <x-card-public cardTitle="Confirmación de Pedido">
         <div class="card-body">
             <h3 class="text-success text-center">¡Gracias por tu pedido, {{ Auth::user()->name }}!</h3>
             <p class="text-center">Pedido número: <strong>{{ $cart->order_number }}</strong></p>
@@ -62,7 +62,7 @@
                 </p>
                 <p>
                     Puede revisar todos los detalles del pedido junto con su estado en 
-                    <a href="#" class="text-primary text-decoration-underline">MIS PEDIDOS</a>.
+                    <a href="{{ route('myOrders') }}" class="text-primary">MIS PEDIDOS</a>.
                 </p>
                 <p>
                     Recuerde que dispone de <strong>30 días</strong> para realizar una devolución.

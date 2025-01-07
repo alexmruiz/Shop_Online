@@ -1,11 +1,10 @@
 <header>
-    <!-- Navbar -->
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark shadow-sm">
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary shadow-lg">
         <div class="container-fluid">
             <!-- Logo -->
             <a class="navbar-brand d-flex align-items-center" href="{{ route('home') }}">
-                <i class="bi bi-shop me-2 fs-4"></i>
-                <span class="fw-bold">Tienda AmR</span>
+                <i class="bi bi-shop me-2 fs-3"></i>
+                <span class="fw-bold fs-4">Tienda AmR</span>
             </a>
 
             <!-- Navbar Toggler -->
@@ -16,30 +15,26 @@
 
             <!-- Navbar Content -->
             <div class="collapse navbar-collapse" id="navbarNav">
-                <!-- Left Navigation -->
                 <ul class="navbar-nav me-auto">
                     <li class="nav-item">
-                        <a class="nav-link active text-capitalize" aria-current="page" href="#">Inicio</a>
+                        <a class="nav-link text-uppercase" href="#about">Acerca</a>
                     </li>
                 </ul>
 
-                <!-- Right Content -->
-                <div class="d-flex align-items-center">
-
+                <div class="d-flex align-items-center gap-3">
                     <!-- Authentication Links -->
                     @if (Route::has('login'))
                     <livewire:welcome.navigation />
                     @endif
 
                     @auth
-                    <!-- User Dropdown -->
-                    <div class="dropdown">
+                    <div class="dropdown me-2">
                         <a href="#" class="text-white dropdown-toggle text-decoration-none d-flex align-items-center"
-                            id="userMenu" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Opciones de usuario">
+                            id="userMenu" data-bs-toggle="dropdown" aria-expanded="false">
                             <i class="bi bi-person-circle me-2 fs-5"></i>
-                            <span class="fw-bold">{{ Auth::user()->name }}</span>
+                            <span>{{ Auth::user()->name }}</span>
                         </a>
-                        <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userMenu">
+                        <ul class="dropdown-menu dropdown-menu-end shadow-lg">
                             <li><a class="dropdown-item" href="#">Perfil</a></li>
                             <li><a class="dropdown-item" href="{{ route('myOrders') }}">Mis Pedidos</a></li>
                             <li>

@@ -2,38 +2,57 @@
 
 namespace App\Livewire\Orders;
 
+use App\Models\Cart;
 use Illuminate\Support\Facades\Auth;
 use Livewire\Attributes\Layout;
 use Livewire\Attributes\Title;
 use Livewire\Component;
+use Livewire\WithPagination;
 
 #[Title('Mis pedidos')]
 #[Layout('components.layouts.app_public')]
 class MyOrders extends Component
 {
-    public $carts;
+    use WithPagination;
+    public $search = '';
+    public $cant = 5;
+
+    protected $paginationTheme = 'bootstrap';
 
     public function mount()
     {
-        $this->carts = Auth::user()->carts()->with('cartItems.product')->get()->map(function ($cart) {
-            // Calcula el total
-            $cart->total = $cart->cartItems->sum(function ($item) {
-                return $item->quantity * $item->unit_price;
-            });
-            // Formatea la fecha
-            $cart->formatted_date = $cart->created_at->format('d/m/Y');
-            return $cart;
-        })->filter(function ($cart) {
-            // Filtra los carritos que no tengan el estado 'PENDING'
-            return $cart->status !== 'pending';
-        });
+        // Elimina $this->carts para que se maneje todo en el render
+    }
+
+    public function updatingSearch()
+    {
+        $this->resetPage();
     }
 
     public function render()
     {
-        return view('livewire.orders.my-orders', [
-            'carts' => $this->carts,
-        ]);
+        $query = Auth::user()->carts()->with('cartItems.product');
+
+        if ($this->search) {
+            $query->where('order_number', 'like', '%' . $this->search . '%');
+        }
+
+        // Pagina los resultados
+        $carts = $query->where('status', '!=', 'pending')
+                       ->orderBy('id', 'desc')
+                       ->paginate($this->cant);
         
-    }   
+        // Formatea y calcula los valores que necesitas
+        $carts->transform(function ($cart) {
+            $cart->total = $cart->cartItems->sum(function ($item) {
+                return $item->quantity * $item->unit_price;
+            });
+            $cart->formatted_date = $cart->created_at->format('d/m/Y');
+            return $cart;
+        });
+
+        return view('livewire.orders.my-orders', [
+            'carts' => $carts,
+        ]);
+    }
 }

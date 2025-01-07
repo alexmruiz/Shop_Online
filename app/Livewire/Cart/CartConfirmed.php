@@ -14,6 +14,7 @@ class CartConfirmed extends Component
 
     public function mount()
     {
+        //Busca los pedidos asociados al usuario con status = confirmed
         $this->cart = Auth::user()->carts()->where('status', 'confirmed')->latest()->first();
         if (!$this->cart) {
             session()->flash('error', 'No se encontró un pedido confirmado.');

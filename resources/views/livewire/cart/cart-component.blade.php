@@ -1,5 +1,5 @@
 <div class="mt-4">
-    <x-card cardTitle="Cesta de la compra">
+    <x-card-public cardTitle="Cesta de la compra">
         <x-slot:cardTools>
             <a href="{{ route('home') }}" class="btn btn-outline-primary float-end">
                 <i class="bi bi-arrow-left-circle"></i> Regresar

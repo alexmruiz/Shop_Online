@@ -1,6 +1,6 @@
 <div class="mt-4 mb-4">
         
-    <x-card cardTitle="Explora nuestros productos">
+    <x-card-public cardTitle="Explora nuestros productos">
         <!-- Barra de herramientas -->
         <div class="d-flex justify-content-between align-items-center mb-4">
             <!-- Buscador -->

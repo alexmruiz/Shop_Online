@@ -2,8 +2,7 @@
 
 namespace App\Livewire\Product;
 
-use App\Models\Cart;
-use App\Models\CartItem;
+use App\Facades\Cart as CartFacade;
 use App\Models\Category;
 use App\Models\Product;
 use Illuminate\Support\Facades\Auth; 
@@ -28,89 +27,69 @@ class PublicProducts extends Component
     public $countItems = 0;
     public $feedbackMessage = null;
 
-    #[Computed()]
+    protected $cartService;
+
+
+    #[Computed()] // Obtiene todas las categorías
     public function categories()
     {
         return Category::all(); 
     }
 
-    private function getOrCreatePendingCart()
+    public function mount()
     {
+        $this->dispatch('update-breadcrumbs', [
+            ['name' => 'Home', 'url' => null],
+        ]);
         
-        $user = Auth::user();
+    }
+    
 
-        if($user){
-             // Obtener el carrito con estado "pending" o crear uno nuevo
-        $cart = Auth::user()->carts()->where('status', 'pending')->first();
-
-        if (!$cart) {
-            $cart = Cart::create([
-                'user_id' => $user->id,
-                'status' => 'pending',
-            ]);
-        }
-
-        return $cart;
-        }
-       
+    public function getOrCreatePendingCart()
+    {
+        return CartFacade::getOrCreatePendingCart(); //Retornar el carrito
     }
 
     public function addToCart($productId)
     {
-        $product = Product::find($productId);
-        $cart = $this->getOrCreatePendingCart();
-
-        $cartItem = $cart->cartItems()->where('product_id', $productId)->first();
-        
-        if ($cartItem) {
-            $cartItem->increment('quantity');
-        } else {
-            $cart->cartItems()->create([
-                'product_id' => $product->id,
-                'quantity' => 1,
-                'unit_price' => $product->price,
-            ]);
-        }
-
+        CartFacade::addToCart($productId); // Utiliza la fachada para agregar al carrito
         $this->feedbackMessage = 'Producto añadido al carrito correctamente.';
         $this->updateCart(); // Actualizar la vista del carrito
     }
 
     public function updateCart()
     {
-        $cart = $this->getOrCreatePendingCart();
-
-        $this->cartItems = $cart->cartItems->map(fn($item) => [
-            'id' => $item->product_id,
-            'name' => $item->product->name,
-            'price' => $item->unit_price,
-            'quantity' => $item->quantity,
-        ])->toArray();
-
-        $this->total = collect($this->cartItems)->sum(fn($item) => $item['price'] * $item['quantity']);
+        // Carga los datos actuales del carrito utilizando la fachada
+        $cartData = CartFacade::loadCart(); 
+        $this->cartItems = $cartData['items'];
+        $this->total = $cartData['total'];
     }
 
     #[Layout('components.layouts.app_public')]
     public function render()
     {
         $query = Product::query();
-        
+
+        // Recupera productos aplicando filtros de búsqueda y categoría.
         if ($this->selectedCategory) {
             $query->where('category_id', $this->selectedCategory);
         }
-        
+
+        // Busca un producto por su nombre
         if ($this->search) {
             $query->where('name', 'like', '%'.$this->search.'%');
         }
 
+        // Los productos son ordenados de forma descendente
         $products = $query->orderBy('id', 'desc')->paginate($this->cant);
-        $user = Auth::user();
-        if($user){
-            $cart = $this->getOrCreatePendingCart();
+
+        // Obtener el carrito del usuario o crear uno si no existe
+        $cart = Auth::user() ? $this->getOrCreatePendingCart() : null;
+
+        if ($cart) {
             $this->countItems = $cart->cartItems()->count();
-            $this->total = $cart->cartItems()->sum('quantity');
+            $this->total = $cart->cartItems()->sum('quantity'); 
         }
-       
 
         return view('livewire.product.public-products', [
             'products' => $products,

@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\Route;
 use App\Livewire\Home\Inicio;
 use App\Livewire\Category\CategoryShow;
 use App\Livewire\Client\ClientComponent;
+use App\Livewire\Client\ClientShow;
 use App\Livewire\Orders\MyOrders;
 use App\Livewire\Product\ProductShow;
 use App\Livewire\Product\PublicProducts;
@@ -42,6 +43,7 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
     Route::get('/ver_producto/{product}', ProductShow::class)->name('productShow');
     // Clientes
     Route::get('/clientes', ClientComponent::class)->name('client');
+    Route::get('/ver_cliente/{user}', ClientShow::class)->name('clientShow');
 });
 
 // Usuarios autenticados rol: 'user'
