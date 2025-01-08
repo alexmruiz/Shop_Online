@@ -21,7 +21,10 @@ class MyOrders extends Component
 
     public function mount()
     {
-        // Elimina $this->carts para que se maneje todo en el render
+        $this->dispatch('update-breadcrumbs', [
+            ['name' => 'Home', 'url' => route('home')],
+            ['name' => 'Mis pedidos', 'url' => null],
+        ]);
     }
 
     public function updatingSearch()

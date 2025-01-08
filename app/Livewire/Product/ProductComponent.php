@@ -184,12 +184,4 @@ class ProductComponent extends Component
         $this->dispatch('msg', 'El producto ha sido eliminado correctamente');
     }
 
-    // Renderiza el botón para crear un nuevo producto
-    public function renderCreateButton()
-    {
-        return '<a href="#" class="btn btn-primary" wire:click="create">
-                <i class="fas fa-plus-circle"></i>
-                Crear producto              
-            </a> ';
-    }
 }

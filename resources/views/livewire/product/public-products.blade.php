@@ -39,20 +39,19 @@
             </div>
         </div>
         
-            @if ($feedbackMessage)
-                <div 
-                    x-data="{ show: true }"
-                    x-show="show"
-                    id="feedback-message"
-                    x-init="setTimeout(() => show = false, 6000); 
-                             $wire.set('feedbackMessage', null)"
-                    class="alert alert-success text-center fw-bold position-fixed top-0 start-50 translate-middle-x mt-3 shadow-lg"
-                    style="z-index: 1050; max-width: 90%;">
-                    {{ $feedbackMessage }}
-                </div>
-            @endif
-        
-        
+        @if ($feedbackMessage)
+        <div 
+            x-data="{ show: true }"
+            x-show="show"
+            id="feedback-message"
+            x-init="setTimeout(() => show = false, 6000); 
+                     $wire.set('feedbackMessage', null)"
+            class="alert alert-success text-center fw-bold position-fixed top-0 start-50 translate-middle-x mt-3 shadow-lg"
+            style="z-index: 1050; max-width: 90%;">
+            {{ $feedbackMessage }}
+        </div>
+        @endif
+    
         
         <!-- Lista de productos -->
         <div class="row">

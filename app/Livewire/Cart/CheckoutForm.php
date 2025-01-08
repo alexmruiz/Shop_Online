@@ -24,12 +24,12 @@ class CheckoutForm extends Component
     protected $rules = [
         'street' => ['required', 'string', 'max:255'],
         'city' => ['required', 'string', 'max:255'],
-        'postalCode' => ['required', 'string', 'max:20'],
+        'postalCode' => ['required', 'digits:5'],
         'province' => ['required', 'string', 'max:255'],
         'paymentMethod' => ['required'],
-        'cardNumber' => ['required_if:paymentMethod,card', 'digits:16'],
-        'expiryDate' => ['required_if:paymentMethod,card', 'date_format:m/y'],
-        'cvv' => ['required_if:paymentMethod,card', 'digits:3'],
+        'cardNumber' => ['digits:16'],
+        'expiryDate' => ['date_format:m/y'],
+        'cvv' => ['digits:3'],
     ];
 
     protected $messages = [
@@ -42,7 +42,7 @@ class CheckoutForm extends Component
         'city.max' => 'La ciudad no debe exceder los 255 caracteres.',
         
         'postalCode.required' => 'El código postal es obligatorio.',
-        'postalCode.string' => 'El código postal debe ser una cadena de texto.',
+        'postalCode.digits' => 'El código postal solo puede contener 5 digitos.',
         'postalCode.max' => 'El código postal no debe exceder los 20 caracteres.',
         
         'province.required' => 'La provincia es obligatoria.',
@@ -51,14 +51,14 @@ class CheckoutForm extends Component
         
         'paymentMethod.required' => 'El método de pago es obligatorio.',
         
-        'cardNumber.required_if' => 'El número de la tarjeta es obligatorio cuando el método de pago es tarjeta.',
         'cardNumber.digits' => 'El número de la tarjeta debe tener 16 dígitos.',
-        
-        'expiryDate.required_if' => 'La fecha de caducidad es obligatoria cuando el método de pago es tarjeta.',
+        'cardNumber.required' => 'El número de tarjeta es obligatorio',
+               
         'expiryDate.date_format' => 'La fecha de caducidad debe estar en el formato mm/aa.',
-        
-        'cvv.required_if' => 'El CVV es obligatorio cuando el método de pago es tarjeta.',
+        'expiryDate.required' => 'La fecha de caducidad es obligatoria',
+                
         'cvv.digits' => 'El CVV debe tener 3 dígitos.',
+        'cvv.required'=> 'El cvv es obligatorio',
     ];
     
 
@@ -73,36 +73,48 @@ class CheckoutForm extends Component
 
     public function processPayment()
     {
-        $this->validate();
-
+        // Define reglas dinámicas basadas en el método de pago seleccionado
+        $rules = $this->rules;
+    
+        if ($this->paymentMethod === 'card') {
+            $rules['cardNumber'] = ['required', 'digits:16'];
+            $rules['expiryDate'] = ['required', 'date_format:m/y'];
+            $rules['cvv'] = ['required', 'digits:3'];
+        } else {
+            // Remueve las reglas para los campos de tarjeta si no es método 'card'
+            unset($rules['cardNumber'], $rules['expiryDate'], $rules['cvv']);
+        }
+    
+        $this->validate($rules);
+    
         // Obtiene el carrito del usuario
         $cart = Auth::user()->carts()->where('status', 'pending')->first();
-
+    
         if (!$cart) {
             session()->flash('error', 'No se encontró un carrito asociado al usuario.');
             return redirect()->route('home');
         }
-
+    
         $address = "{$this->street}, {$this->city}, {$this->province}, {$this->postalCode}";
-
+    
         if ($this->paymentMethod === 'paypal') {
             session()->flash('success', 'Tu pago ha sido completado con PayPal.');
         } else {
             session()->flash('success', 'Tu pago ha sido procesado exitosamente con tarjeta.');
         }
-
+    
         // Actualiza el estado del carrito
         $updated = $cart->update([
             'address' => $address,
             'status' => 'confirmed',
             'order_number' => $this->generateOrderNumber(),
         ]);
-
+    
         if (!$updated) {
             session()->flash('error', 'No se pudo actualizar.');
             return redirect()->back();
         }
-
+    
         return redirect()->route('confirmed');
     }
 
