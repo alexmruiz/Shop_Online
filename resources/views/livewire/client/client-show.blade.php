@@ -49,6 +49,11 @@
                         </li>
                     @endforeach
                 </ul>
+                
+                <!-- Botón para generar PDF -->
+                <div class="mt-4">
+                    <a href="{{ route('downloaded.invoice', ['id' => $cart->id]) }}" target="_blank" class="btn btn-outline-primary">Descargar Factura</a>
+                </div>
             </div>
         @empty
             <div class="alert alert-info mt-4" role="alert">

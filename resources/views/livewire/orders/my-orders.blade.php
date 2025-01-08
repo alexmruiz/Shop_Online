@@ -57,6 +57,8 @@
                             </li>
                         @endforeach
                     </ul>
+                    <!-- Botón para generar PDF -->
+                    <a href="{{ route('download.invoice', ['id' => $cart->id]) }}" target="_blank" class="btn btn-outline-success">Descargar Factura</a>
                 </div>
             @endforeach
 
@@ -68,7 +70,6 @@
         </div>
 
         <x-slot:cardFooter>
-            <!-- Pagina los resultados correctamente -->
             {{ $carts->links() }}
         </x-slot>
     </x-card>

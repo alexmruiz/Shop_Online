@@ -9,9 +9,7 @@
             <!-- Detalles del Pedido -->
             <h5 class="mt-4">Detalles del Pedido</h5>
             <ul class="list-group">
-                @php
-                    $total = 0;
-                @endphp
+                @php $total = 0; @endphp
                 @foreach ($cart->cartItems as $item)
                     <li class="list-group-item d-flex align-items-center">
                         <div class="flex-shrink-0">
@@ -31,7 +29,6 @@
                         </div>
                     </li>
                     @php
-                        // Sumar el precio del artículo al total
                         $total += $item->unit_price * $item->quantity;
                     @endphp
                 @endforeach
@@ -68,8 +65,11 @@
                     Recuerde que dispone de <strong>30 días</strong> para realizar una devolución.
                 </p>
             </div>
-            <div class="mt-4 text-center">
+
+            <!-- Botones alineados horizontalmente -->
+            <div class="mt-4 d-flex justify-content-center gap-3">
                 <a href="{{ route('home') }}" class="btn btn-primary">Volver al inicio</a>
+                <a href="{{ route('generate.invoice') }}" target="_blank" class="btn btn-success">Descargar Factura</a>
             </div>
         </div>
     </x-card>

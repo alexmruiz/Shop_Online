@@ -41,11 +41,10 @@ class Inicio extends Component
         $this->totalRegistrosProduct = Product::count();
         $this->totalRegistrosClient = User::where ('role', 'user')-> count();
 
-        $productComponent = new ProductComponent();
-        $createButtonHtml = $productComponent->renderCreateButton();
+       
         return view('livewire.home.inicio', data: [
          
-            'createButtonHtml' => $createButtonHtml,
+            
             'topSellingProducts' => $this->topSellingProducts,
         ]);
     }

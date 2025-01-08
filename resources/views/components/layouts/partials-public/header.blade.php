@@ -35,7 +35,7 @@
                             <span>{{ Auth::user()->name }}</span>
                         </a>
                         <ul class="dropdown-menu dropdown-menu-end shadow-lg">
-                            <li><a class="dropdown-item" href="#">Perfil</a></li>
+                            <li><a class="dropdown-item" href="{{ route('profile') }}">Perfil</a></li>
                             <li><a class="dropdown-item" href="{{ route('myOrders') }}">Mis Pedidos</a></li>
                             <li>
                                 <hr class="dropdown-divider">

@@ -50,7 +50,7 @@
   
           <!-- Menu Footer-->
           <li class="user-footer">
-            <a class="btn btn-default btn-flat">Perfil</a>
+            <a class="btn btn-default btn-flat" href="{{ route('profile') }}">Perfil</a>
            <a class="btn btn-default btn-flat float-right" href=""
             onclick="event.preventDefault();
                           document.getElementById('logout-form').submit();">

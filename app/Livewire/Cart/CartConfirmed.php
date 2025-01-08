@@ -2,6 +2,7 @@
 
 namespace App\Livewire\Cart;
 
+use App\Facades\InvoiceFacade;
 use Illuminate\Support\Facades\Auth;
 use Livewire\Attributes\Layout;
 use Livewire\Attributes\Title;
@@ -22,6 +23,12 @@ class CartConfirmed extends Component
         }
     
     }
+    //Genera la factura asociada al pedido
+    public function generateInvoice()
+    {
+        return InvoiceFacade::generateInvoice();
+    }
+
 
     #[Layout('components.layouts.app_public')]
     public function render()

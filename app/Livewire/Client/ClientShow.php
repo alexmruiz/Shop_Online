@@ -2,6 +2,7 @@
 
 namespace App\Livewire\Client;
 
+use App\Facades\InvoiceFacade;
 use App\Models\User;
 use Livewire\Attributes\Title;
 use Livewire\Component;
@@ -15,6 +16,11 @@ class ClientShow extends Component
     {
         // Cargar el usuario con los pedidos y sus items asociados
         $this->user = $user->load('carts.cartItems.product');
+    }
+
+    public function downloadInvoice($id)
+    {
+        return InvoiceFacade::downloadInvoice($id);
     }
 
     public function render()

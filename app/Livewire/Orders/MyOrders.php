@@ -2,6 +2,7 @@
 
 namespace App\Livewire\Orders;
 
+use App\Facades\InvoiceFacade;
 use App\Models\Cart;
 use Illuminate\Support\Facades\Auth;
 use Livewire\Attributes\Layout;
@@ -30,6 +31,11 @@ class MyOrders extends Component
     public function updatingSearch()
     {
         $this->resetPage();
+    }
+
+    public function downloadInvoice($id)
+    {
+        return InvoiceFacade::downloadInvoice($id);
     }
 
     public function render()

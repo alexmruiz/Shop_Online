@@ -22,6 +22,7 @@ Route::view('profile', 'profile')
 
 require __DIR__.'/auth.php';
 
+
 //Inicio
 Route::get('/', PublicProducts::class)->name('start')->middleware('guest');
 
@@ -43,7 +44,10 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
     Route::get('/ver_producto/{product}', ProductShow::class)->name('productShow');
     // Clientes
     Route::get('/clientes', ClientComponent::class)->name('client');
+    //Descargar factura en ver clientes
     Route::get('/ver_cliente/{user}', ClientShow::class)->name('clientShow');
+     //Descargar facturas(Ver clientes)
+    Route::get('/invoice_downloaded/{id}', [ClientShow::class, 'downloadInvoice'])->name('downloaded.invoice');
 });
 
 // Usuarios autenticados rol: 'user'
@@ -61,7 +65,13 @@ Route::middleware(['auth', 'role:user'])->group(function () {
     //Confirmed
     Route::get('/pedido_corfirmado', CartConfirmed::class)->name('confirmed');
 
+    //Descargar factura(Pedido aceptado)
+    Route::get('/invoice/download', [CartConfirmed::class, 'generateInvoice'])->name('generate.invoice');
+
     //My Orders
     Route::get('/mis_pedidos', MyOrders::class)->name('myOrders');
 
-});
+    //Descargar facturas(Mis facturas)
+    Route::get('/invoice/download/{id}', [MyOrders::class, 'downloadInvoice'])->name('download.invoice');
+
+}); 
