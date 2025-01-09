@@ -25,7 +25,7 @@ Este proyecto ha sido creado con **Laravel**, utilizando la tecnología de **Liv
 - **Framework**: Laravel (PHP).  
 - **Frontend**: Blade con componentes **Livewire 3**.  
 - **Base de datos**: MySQL.  
-- **Gráficas**: Librería para visualización de datos (especificar la librería si ya está definida).  
-- **Generación de PDFs**: Librería de creación de documentos PDF.  
+- **Gráficas**: **Chart.js** para visualización de datos..  
+- **Generación de PDFs**: Librería de creación de documentos PDF de Laravel **Dompdf**.  
 
 Este proyecto busca ser una base para una tienda online funcional 
