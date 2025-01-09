@@ -90,7 +90,7 @@
                             @endauth
                             @guest
                             <div class="mt-auto">
-                                <a href="{{ route('login') }}" class="btn btn-secondary w-100 mt-2">
+                                <a href="{{ route('login') }}" class="btn btn-primary w-100 mt-2">
                                     <i class="fas fa-sign-in-alt"></i> Inicia sesión para comprar
                                 </a>
                             </div>
