@@ -84,6 +84,16 @@ footer {
     color: #7f8c8d; /* Texto gris para indicar imagen no cargada */
 }
 
+.image-product {
+    width: 100%; /* Asegura que ocupe el ancho del contenedor */
+    height: 300px; /* Altura fija uniforme para todas las imágenes */
+    object-fit: cover; /* Ajusta la imagen sin deformarse */
+    border-radius: 8px; /* Opcional: redondea las esquinas */
+    background-color: #f8f9fa; /* Fondo por defecto para mejor visualización */
+    display: block; /* Asegura que las imágenes se comporten de manera consistente */
+}
+
+
 .breadcrumb {
     background-color: #f8f9fa !important;
     font-size: 0.9rem;

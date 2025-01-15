@@ -69,8 +69,8 @@
                     <div class="card h-100 shadow-sm border-0 rounded-3">
                         <!-- Imagen del Producto -->
                         <x-image-product :product="$product" 
-                                         class="card-img-top w-100 h-auto img-fluid object-fit-cover"
-                                         alt="Imagen de {{ $product->name }}" />
+                                         class="image-product"
+                                          />
 
                         <!-- Detalles del Producto -->
                         <div class="card-body d-flex flex-column text-center">
@@ -84,15 +84,14 @@
                             <div class="mt-auto">
                                 <a href="#" wire:click.prevent="addToCart('{{ $product->id }}')"
                                     class="btn btn-primary w-100 mt-2">
-                                    <i class="fas fa-shopping-cart"></i> Añadir al carrito
+                                    Añadir al carrito 
                                 </a>
                             </div>
                             @endauth
                             @guest
                             <div class="mt-auto">
                                 <a href="{{ route('login') }}" class="btn btn-primary w-100 mt-2">
-                                    <i class="fas fa-sign-in-alt"></i> Inicia sesión para comprar
-                                </a>
+                                    Añadir al carrito 
                             </div>
                             @endguest
                         </div>

@@ -27,28 +27,6 @@ class ClientComponent extends Component
     public $role;
 
     public $selectedUser;
-   
-    public function render()
-    {
-        $query = User::query();
-
-        if (!empty($this->selectedUser)) {
-            $query->where('role', $this->selectedUser);
-        }
-        
-        $this->totalRegistros = $query->count();
-        
-        $users = $query
-            ->where('name', 'like', '%' . $this->search . '%')
-            ->orderBy('id', 'desc')
-            ->paginate($this->cant);
-
-            $roles = User::select('role')->distinct()->pluck('role');
-            return view('livewire.client.client-component', [
-                'users' => $users,
-                'roles' => $roles,
-            ]);
-    }
 
     public function create(){
 
@@ -121,7 +99,7 @@ class ClientComponent extends Component
     {
         $rules = [
             'name' => 'required|min:3|max:255',
-            'email' => "required|email|max:255", // Excluye al usuario actual
+            'email' => "required|email|max:255|unique:users,email,{$user->id}", 
             'password' => 'required|min:6', // Contraseña opcional durante la edición
             'confirmpassword' => 'required|same:password', // Opcional, pero debe coincidir si se proporciona
             'role' => 'required|string|max:255',
@@ -139,7 +117,7 @@ class ClientComponent extends Component
             'email.max' => 'El correo electrónico no puede exceder los 255 caracteres.',
             'email.unique' => 'El correo electrónico ya está registrado en nuestra base de datos.',
             
-            'password.require' => 'La contraseña es obligatoria',
+            'password.required' => 'La contraseña es obligatoria',
             'password.min' => 'La contraseña debe contener al menos 6 caracteres.',
             'confirmpassword.same' => 'La confirmación de contraseña no coincide con la nueva contraseña.',
     
@@ -151,7 +129,7 @@ class ClientComponent extends Component
         $user->update([
             'name' => $this->name,
             'email' => $this->email,
-            'password' => $this->password,
+            'password' => bcrypt($this->password),
             'role' => $this->role,
         ]);
     
@@ -176,5 +154,27 @@ class ClientComponent extends Component
         $user->delete();
 
         $this->dispatch('msg', 'El cliente ha sido eliminado correctamente');
+    }
+
+    public function render()
+    {
+        $query = User::query();
+
+        if (!empty($this->selectedUser)) {
+            $query->where('role', $this->selectedUser);
+        }
+        
+        $this->totalRegistros = $query->count();
+        
+        $users = $query
+            ->where('name', 'like', '%' . $this->search . '%')
+            ->orderBy('id', 'desc')
+            ->paginate($this->cant);
+
+            $roles = User::select('role')->distinct()->pluck('role');
+            return view('livewire.client.client-component', [
+                'users' => $users,
+                'roles' => $roles,
+            ]);
     }
 }
