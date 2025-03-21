@@ -133,9 +133,9 @@ class ClientComponent extends Component
             'role' => $this->role,
         ]);
     
-        $this->dispatch('close-modal', 'modalClient');
+        $this->dispatch('close-modal', 'modalClient');    
         $this->dispatch('msg', 'Cliente editado correctamente');
-    
+      
         $this->clean();
     }
     

@@ -92,6 +92,7 @@
                             <div class="mt-auto">
                                 <a href="{{ route('login') }}" class="btn btn-primary w-100 mt-2">
                                     Añadir al carrito 
+                                </a>
                             </div>
                             @endguest
                         </div>
