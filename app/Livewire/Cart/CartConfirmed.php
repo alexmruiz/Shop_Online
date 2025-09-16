@@ -21,7 +21,6 @@ class CartConfirmed extends Component
             session()->flash('error', 'No se encontró un pedido confirmado.');
             return redirect()->route('home');
         }
-    
     }
     //Genera la factura asociada al pedido
     public function generateInvoice()
@@ -33,7 +32,7 @@ class CartConfirmed extends Component
     #[Layout('components.layouts.app_public')]
     public function render()
     {
-        
+
         return view('livewire.cart.cart-confirmed');
     }
 }

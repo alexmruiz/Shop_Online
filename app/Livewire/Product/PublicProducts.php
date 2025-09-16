@@ -50,11 +50,17 @@ class PublicProducts extends Component
         return CartFacade::getOrCreatePendingCart(); //Retornar el carrito
     }
 
+    /**
+     * Agrega un producto al carrito y actualiza la vista del carrito
+     * @param mixed $productId
+     * @return void
+     */
     public function addToCart($productId)
     {
         CartFacade::addToCart($productId); // Utiliza la fachada para agregar al carrito
-        $this->feedbackMessage = 'Producto añadido al carrito correctamente.';
+        //$this->feedbackMessage = 'Producto añadido al carrito correctamente.';
         $this->updateCart(); // Actualizar la vista del carrito
+        $this->dispatch('product-add', id: $productId); 
     }
 
     public function updateCart()

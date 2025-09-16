@@ -30,28 +30,28 @@ class CartComponent extends Component
         $this->cartItems = $cartData['items'];
         $this->total = $cartData['total'];
     }
-    
-   //Incrementa una unidad del producto seleccionado
+
+    //Incrementa una unidad del producto seleccionado
     public function increaseQuantity($itemId)
     {
-       CartFacade::increaseQuantity($itemId);
-       $this->loadCart();
+        CartFacade::increaseQuantity($itemId);
+        $this->loadCart();
     }
-    
+
     //Decrementa una unidad del producto seleccionado
     public function decreaseQuantity($itemId)
     {
-       CartFacade::decreaseQuantity($itemId);
-       $this->loadCart();
+        CartFacade::decreaseQuantity($itemId);
+        $this->loadCart();
     }
-    
+
     //Elimina el producto seleccionado
     public function removeFromCart($itemId)
     {
-       CartFacade::removeFromCart($itemId);
-       $this->loadCart();
+        CartFacade::removeFromCart($itemId);
+        $this->loadCart();
     }
-    
+
     public function render()
     {
         return view('livewire.cart.cart-component', [

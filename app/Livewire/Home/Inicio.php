@@ -14,7 +14,7 @@ use Livewire\Attributes\Title;
 #[Title('Inicio')]
 class Inicio extends Component
 {
-    public $Id=0;
+    public $Id = 0;
     public $totalRegistrosClient = 0;
     public $totalRegistrosProduct = 0;
     public $category_id;
@@ -39,14 +39,13 @@ class Inicio extends Component
     public function render()
     {
         $this->totalRegistrosProduct = Product::count();
-        $this->totalRegistrosClient = User::where ('role', 'user')-> count();
+        $this->totalRegistrosClient = User::where('role', 'user')->count();
 
-       
+
         return view('livewire.home.inicio', data: [
-         
-            
+
+
             'topSellingProducts' => $this->topSellingProducts,
         ]);
     }
-    
 }

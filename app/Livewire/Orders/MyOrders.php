@@ -48,9 +48,9 @@ class MyOrders extends Component
 
         // Pagina los resultados
         $carts = $query->where('status', '!=', 'pending')
-                       ->orderBy('id', 'desc')
-                       ->paginate($this->cant);
-        
+            ->orderBy('id', 'desc')
+            ->paginate($this->cant);
+
         // Formatea y calcula los valores que necesitas
         $carts->transform(function ($cart) {
             $cart->total = $cart->cartItems->sum(function ($item) {

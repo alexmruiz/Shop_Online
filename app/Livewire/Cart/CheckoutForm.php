@@ -32,35 +32,37 @@ class CheckoutForm extends Component
         'cvv' => ['digits:3'],
     ];
 
-    protected $messages = [
-        'street.required' => 'La calle es obligatoria.',
-        'street.string' => 'La calle debe ser una cadena de texto.',
-        'street.max' => 'La calle no debe exceder los 255 caracteres.',
-        
-        'city.required' => 'La ciudad es obligatoria.',
-        'city.string' => 'La ciudad debe ser una cadena de texto.',
-        'city.max' => 'La ciudad no debe exceder los 255 caracteres.',
-        
-        'postalCode.required' => 'El código postal es obligatorio.',
-        'postalCode.digits' => 'El código postal solo puede contener 5 digitos.',
-        'postalCode.max' => 'El código postal no debe exceder los 20 caracteres.',
-        
-        'province.required' => 'La provincia es obligatoria.',
-        'province.string' => 'La provincia debe ser una cadena de texto.',
-        'province.max' => 'La provincia no debe exceder los 255 caracteres.',
-        
-        'paymentMethod.required' => 'El método de pago es obligatorio.',
-        
-        'cardNumber.digits' => 'El número de la tarjeta debe tener 16 dígitos.',
-        'cardNumber.required' => 'El número de tarjeta es obligatorio',
-               
-        'expiryDate.date_format' => 'La fecha de caducidad debe estar en el formato mm/aa.',
-        'expiryDate.required' => 'La fecha de caducidad es obligatoria',
-                
-        'cvv.digits' => 'El CVV debe tener 3 dígitos.',
-        'cvv.required'=> 'El cvv es obligatorio',
-    ];
-    
+ protected function messages()
+    {
+        return [
+            'street.required' => __('checkout-validation.street_required'),
+            'street.string' => __('checkout-validation.street_string'),
+            'street.max' => __('checkout-validation.street_max'),
+
+            'city.required' => __('checkout-validation.city_required'),
+            'city.string' => __('checkout-validation.city_string'),
+            'city.max' => __('checkout-validation.city_max'),
+
+            'postalCode.required' => __('checkout-validation.postalCode_required'),
+            'postalCode.digits' => __('checkout-validation.postalCode_digits'),
+
+            'province.required' => __('checkout-validation.province_required'),
+            'province.string' => __('checkout-validation.province_string'),
+            'province.max' => __('checkout-validation.province_max'),
+
+            'paymentMethod.required' => __('checkout-validation.paymentMethod_required'),
+
+            'cardNumber.required' => __('checkout-validation.cardNumber_required'),
+            'cardNumber.digits' => __('checkout-validation.cardNumber_digits'),
+
+            'expiryDate.required' => __('checkout-validation.expiryDate_required'),
+            'expiryDate.date_format' => __('checkout-validation.expiryDate_date_format'),
+
+            'cvv.required' => __('checkout-validation.cvv_required'),
+            'cvv.digits' => __('checkout-validation.cvv_digits'),
+        ];
+    }
+
 
     public function mount()
     {
@@ -75,7 +77,7 @@ class CheckoutForm extends Component
     {
         // Define reglas dinámicas basadas en el método de pago seleccionado
         $rules = $this->rules;
-    
+
         if ($this->paymentMethod === 'card') {
             $rules['cardNumber'] = ['required', 'digits:16'];
             $rules['expiryDate'] = ['required', 'date_format:m/y'];
@@ -84,37 +86,37 @@ class CheckoutForm extends Component
             // Remueve las reglas para los campos de tarjeta si no es método 'card'
             unset($rules['cardNumber'], $rules['expiryDate'], $rules['cvv']);
         }
-    
-        $this->validate($rules);
-    
+
+        $this->validate($rules, $this->messages());
+
         // Obtiene el carrito del usuario
         $cart = Auth::user()->carts()->where('status', 'pending')->first();
-    
+
         if (!$cart) {
             session()->flash('error', 'No se encontró un carrito asociado al usuario.');
             return redirect()->route('home');
         }
-    
+
         $address = "{$this->street}, {$this->city}, {$this->province}, {$this->postalCode}";
-    
+
         if ($this->paymentMethod === 'paypal') {
             session()->flash('success', 'Tu pago ha sido completado con PayPal.');
         } else {
             session()->flash('success', 'Tu pago ha sido procesado exitosamente con tarjeta.');
         }
-    
+
         // Actualiza el estado del carrito
         $updated = $cart->update([
             'address' => $address,
             'status' => 'confirmed',
             'order_number' => $this->generateOrderNumber(),
         ]);
-    
+
         if (!$updated) {
             session()->flash('error', 'No se pudo actualizar.');
             return redirect()->back();
         }
-    
+
         return redirect()->route('confirmed');
     }
 
