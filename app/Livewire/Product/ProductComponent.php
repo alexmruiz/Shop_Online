@@ -8,6 +8,7 @@ use Livewire\Attributes\Title;
 use Livewire\Attributes\Computed;
 use Livewire\WithPagination;
 use App\Models\Category;
+use App\Services\ProductService;
 use Livewire\Attributes\On;
 use Livewire\WithFileUploads;
 
@@ -17,7 +18,7 @@ class ProductComponent extends Component
     use WithPagination, WithFileUploads;
 
     protected $paginationTheme = 'bootstrap'; // Configura el tema de paginación a Bootstrap
-   
+
     // Propiedades de la clase
     public $totalRegistros = 0;
     public $search = '';
@@ -37,10 +38,10 @@ class ProductComponent extends Component
     {
         $this->totalRegistros = Product::count(); // Cuenta el total de registros de productos
 
-        $products = Product::where('name', 'like', '%'.$this->search.'%')
-            ->orderBy('id', 'desc') 
+        $products = Product::where('name', 'like', '%' . $this->search . '%')
+            ->orderBy('id', 'desc')
             ->paginate($this->cant); // Paginación de productos según la búsqueda
-            
+
         return view('livewire.product.product-component', [
             'products' => $products
         ]);
@@ -70,7 +71,7 @@ class ProductComponent extends Component
             'category_id' => 'required|numeric',
             'image' => 'image|max:1024|nullable',
         ];
-    
+
         $messages = [
             'name.required' => 'El nombre es requerido',
             'name.min' => 'El nombre debe tener al menos 5 caracteres.',
@@ -83,16 +84,16 @@ class ProductComponent extends Component
             'image.image' => 'El archivo debe ser una imagen.',
             'image.max' => 'La imagen no puede exceder los 1024KB.',
         ];
-    
+
         $this->validate($rules, $messages);
 
         $product = new Product();
 
-         if($this->image){
-            $customName = uniqid().'.'.$this->image->extension();
+        if ($this->image) {
+            $customName = uniqid() . '.' . $this->image->extension();
             $path = $this->image->storeAs("images/products/$customName");
             $product->image = $path;
-         }
+        }
 
         $product->name = $this->name;
         $product->description = $this->description;
@@ -131,7 +132,7 @@ class ProductComponent extends Component
             'category_id' => 'required|numeric',
             'image' => 'image|max:1024|nullable',
         ];
-    
+
         $messages = [
             'name.required' => 'El nombre es requerido',
             'name.min' => 'El nombre debe tener al menos 5 caracteres.',
@@ -147,13 +148,13 @@ class ProductComponent extends Component
 
         $this->validate($rules, $messages);
 
-        if($this->image){
-            $customName = uniqid().'.'.$this->image->extension();
+        if ($this->image) {
+            $customName = uniqid() . '.' . $this->image->extension();
             $path = $this->image->storeAs("images/products/$customName", 'public');
             $product->image = $path;
-         }
+        }
 
-         $product->update([
+        $product->update([
             'name' => $this->name,
             'description' => $this->description,
             'price' => $this->price,

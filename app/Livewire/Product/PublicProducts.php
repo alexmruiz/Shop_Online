@@ -5,6 +5,7 @@ namespace App\Livewire\Product;
 use App\Facades\Cart as CartFacade;
 use App\Models\Category;
 use App\Models\Product;
+use App\Services\ProductService;
 use Illuminate\Support\Facades\Auth; 
 use Livewire\Attributes\Computed;
 use Livewire\Attributes\Layout;
@@ -36,14 +37,17 @@ class PublicProducts extends Component
         return Category::all(); 
     }
 
-    public function mount()
+    public function mount(ProductService $service)
     {
         $this->dispatch('update-breadcrumbs', [
             ['name' => 'Home', 'url' => null],
         ]);
+
+        if (Product::count() === 0) {
+            $service->importProducts();
+        }
         
     }
-    
 
     public function getOrCreatePendingCart()
     {
@@ -101,5 +105,16 @@ class PublicProducts extends Component
             'products' => $products,
             'categories' => Category::all(),
         ]);
+    }
+
+        public function importExternalproducts(ProductService $productService): void
+    {
+        $imported = $productService->importProducts();
+
+        if ($imported) {
+            $this->dispatch('msg', 'Productos importados correctamente');
+        } else {
+            $this->dispatch('msg', 'Error al importar productos');
+        }
     }
 }
