@@ -10,7 +10,10 @@ use Illuminate\Support\Facades\Auth;
 
 class InvoiceService
 {
-    // Método para generar la factura para el pedido individual
+    /**
+     * Summary of generateInvoice
+     * @return \Illuminate\Contracts\Routing\ResponseFactory|\Illuminate\Http\RedirectResponse|\Illuminate\Http\Response
+     */
     public function generateInvoice()
     {
 
@@ -36,7 +39,7 @@ class InvoiceService
             'cart' => $cart,
             'userName' => $cart->user->name ?? 'Cliente desconocido'
         ])->render();
-        
+
         $dompdf->loadHtml($html);
         $dompdf->setPaper('A4', 'portrait');
         $dompdf->render();
@@ -46,7 +49,6 @@ class InvoiceService
             'Content-Type' => 'application/pdf',
             'Content-Disposition' => 'attachment; filename="factura-' . $cart->order_number . '.pdf"',
         ]);
-        
     }
 
     //Descarga el pdf asociado a una factura en concreto
@@ -65,7 +67,7 @@ class InvoiceService
             'cart' => $cart,
             'userName' => $cart->user->name ?? 'Cliente desconocido'
         ])->render();
-        
+
         // Cargar el HTML y generar el PDF
         $dompdf->loadHtml($html);
         $dompdf->setPaper('A4', 'portrait');
@@ -83,6 +85,4 @@ class InvoiceService
             ]
         );
     }
-
-    
 }

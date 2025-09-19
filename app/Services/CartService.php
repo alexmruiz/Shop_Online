@@ -20,7 +20,7 @@ class CartService
             // Buscar el carrito con estado "pending" o crear uno nuevo
             $cart = $user->carts()->where('status', 'pending')->first();
             if (!$cart) {
-                $cart = Cart::create([
+                $cart = \App\Models\Cart::create([
                     'user_id' => $user->id,
                     'status' => 'pending',
                 ]);
@@ -64,6 +64,7 @@ class CartService
     public function increaseQuantity($itemId)
     {
         $cart = $this->getOrCreatePendingCart();
+
         if ($cart) {
             $item = $cart->cartItems()->find($itemId);
             if ($item) {
