@@ -28,45 +28,10 @@
                         </div>
                     </div>
 
-                    <!-- Método de Pago -->
-                    <h5 class="mb-4 text-primary fw-bold">{{ __('checkout.payment_method') }}</h5>
-                    <div class="form-check form-check-inline mb-3">
-                        <input class="form-check-input" type="radio" id="paypal" value="paypal" wire:model="paymentMethod">
-                        <label class="form-check-label d-flex align-items-center" for="paypal">
-                            <i class="bi bi-paypal me-2"></i> {{ __('checkout.paypal') }}
-                        </label>
-                    </div>
-                    <div class="form-check form-check-inline">
-                        <input class="form-check-input" type="radio" id="card" value="card" wire:model="paymentMethod">
-                        <label class="form-check-label d-flex align-items-center" for="card">
-                            <i class="bi bi-credit-card me-2"></i> {{ __('checkout.credit_card') }}
-                        </label>
-                    </div>
-                    @error('paymentMethod') <span class="text-danger small d-block">{{ $message }}</span> @enderror
-
-                    <!-- Datos de Tarjeta -->
-                    @if ($paymentMethod === 'card')
-                        <div class="row mt-3">
-                            <div class="col-md-12 mb-3">
-                                <label for="cardNumber" class="form-label">{{ __('checkout.card_number') }}</label>
-                                <input type="text" id="cardNumber" wire:model.defer="cardNumber" class="form-control" placeholder="{{ __('checkout.card_number_placeholder') }}">
-                                @error('cardNumber') <span class="text-danger small">{{ $message }}</span> @enderror
-                            </div>
-                            <div class="col-md-6 mb-3">
-                                <label for="expiryDate" class="form-label">{{ __('checkout.expiry_date') }}</label>
-                                <input type="text" id="expiryDate" wire:model.defer="expiryDate" class="form-control" placeholder="{{ __('checkout.expiry_date_placeholder') }}">
-                                @error('expiryDate') <span class="text-danger small">{{ $message }}</span> @enderror
-                            </div>
-                            <div class="col-md-6 mb-3">
-                                <label for="cvv" class="form-label">{{ __('checkout.cvv') }}</label>
-                                <input type="text" id="cvv" wire:model.defer="cvv" class="form-control" placeholder="{{ __('checkout.cvv_placeholder') }}">
-                                @error('cvv') <span class="text-danger small">{{ $message }}</span> @enderror
-                            </div>
-                        </div>
-                    @endif
-
                     <!-- Botón de Finalizar -->
-                    <button type="submit" class="btn btn-primary w-100 mt-4">{{ __('checkout.confirm_purchase') }}</button>
+                    <button type="submit" class="btn btn-primary w-100 mt-4">
+                        {{ __('checkout.confirm_purchase') }}
+                    </button>
                 </form>
             </div>
         </div>

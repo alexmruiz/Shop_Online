@@ -84,5 +84,10 @@ Route::middleware(['locale'])->group(function () {
 
         //Descargar facturas(Mis facturas)
         Route::get('/invoice/download/{id}', [MyOrders::class, 'downloadInvoice'])->name('download.invoice');
+
+        //Pago cancelado
+        Route::get('/checkout-cancel', function () {
+            return view('checkout-cancel');
+        })->name('checkout-cancel');
     });
 });
