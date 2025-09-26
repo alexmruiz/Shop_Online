@@ -7,6 +7,10 @@ use Livewire\Attributes\Layout;
 use Livewire\Attributes\Title;
 use Livewire\Component;
 
+/**
+ * Componente Livewire para gestionar la cesta de la compra.
+ * Permite ver los productos en el carrito, modificar cantidades y eliminar productos.
+ */
 #[Title("Cesta de la compra")]
 class CartComponent extends Component
 {
@@ -23,7 +27,10 @@ class CartComponent extends Component
         ]);
     }
 
-    //Carga el carrito asociado al usuario
+    /**
+     * Summary of loadCart
+     * @return void
+     */
     public function loadCart()
     {
         $cartData = CartFacade::loadCart();
@@ -31,21 +38,33 @@ class CartComponent extends Component
         $this->total = $cartData['total'];
     }
 
-    //Incrementa una unidad del producto seleccionado
+    /**
+     * Summary of increaseQuantity
+     * @param mixed $itemId
+     * @return void
+     */
     public function increaseQuantity($itemId)
     {
         CartFacade::increaseQuantity($itemId);
         $this->loadCart();
     }
 
-    //Decrementa una unidad del producto seleccionado
+    /**
+     * Summary of decreaseQuantity
+     * @param mixed $itemId
+     * @return void
+     */
     public function decreaseQuantity($itemId)
     {
         CartFacade::decreaseQuantity($itemId);
         $this->loadCart();
     }
 
-    //Elimina el producto seleccionado
+    /**
+     * Summary of removeFromCart
+     * @param mixed $itemId
+     * @return void
+     */
     public function removeFromCart($itemId)
     {
         CartFacade::removeFromCart($itemId);

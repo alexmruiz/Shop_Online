@@ -3,7 +3,7 @@
 namespace App\Livewire\Orders;
 
 use App\Facades\InvoiceFacade;
-use App\Models\Cart;
+use App\Services\OrderService;
 use Illuminate\Support\Facades\Auth;
 use Livewire\Attributes\Layout;
 use Livewire\Attributes\Title;
@@ -15,10 +15,18 @@ use Livewire\WithPagination;
 class MyOrders extends Component
 {
     use WithPagination;
+
     public $search = '';
     public $cant = 5;
 
     protected $paginationTheme = 'bootstrap';
+
+    private OrderService $orderService;
+
+    public function boot(OrderService $orderService)
+    {
+        $this->orderService = $orderService;
+    }
 
     public function mount()
     {
@@ -40,28 +48,10 @@ class MyOrders extends Component
 
     public function render()
     {
-        $query = Auth::user()->carts()->with('cartItems.product');
-
-        if ($this->search) {
-            $query->where('order_number', 'like', '%' . $this->search . '%');
-        }
-
-        // Pagina los resultados
-        $carts = $query->where('status', '!=', 'pending')
-            ->orderBy('id', 'desc')
-            ->paginate($this->cant);
-
-        // Formatea y calcula los valores que necesitas
-        $carts->transform(function ($cart) {
-            $cart->total = $cart->cartItems->sum(function ($item) {
-                return $item->quantity * $item->unit_price;
-            });
-            $cart->formatted_date = $cart->created_at->format('d/m/Y');
-            return $cart;
-        });
+        $orders = $this->orderService->getOrders(Auth::user(), $this->search, $this->cant);
 
         return view('livewire.orders.my-orders', [
-            'carts' => $carts,
+            'carts' => $orders,
         ]);
     }
 }

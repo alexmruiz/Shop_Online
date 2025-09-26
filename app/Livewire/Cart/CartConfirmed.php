@@ -8,6 +8,10 @@ use Livewire\Attributes\Layout;
 use Livewire\Attributes\Title;
 use Livewire\Component;
 
+/**
+ * Este componente muestra la confirmación del pedido realizado por el usuario.
+ * Busca el último carrito confirmado del usuario autenticado y permite generar la factura asociada.
+ */
 #[Title('Pedido Confirmado')]
 class CartConfirmed extends Component
 {
@@ -22,12 +26,15 @@ class CartConfirmed extends Component
             return redirect()->route('home');
         }
     }
-    //Genera la factura asociada al pedido
+    
+    /**
+     * Summary of generateInvoice
+     * @return \Illuminate\Contracts\Routing\ResponseFactory|\Illuminate\Http\RedirectResponse|\Illuminate\Http\Response
+     */
     public function generateInvoice()
     {
         return InvoiceFacade::generateInvoice();
     }
-
 
     #[Layout('components.layouts.app_public')]
     public function render()

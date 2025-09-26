@@ -2,6 +2,7 @@
 
 namespace App\Livewire\Cart;
 
+use App\Services\CheckoutService;
 use Illuminate\Support\Facades\Auth;
 use Livewire\Attributes\Layout;
 use Livewire\Attributes\Title;
@@ -14,9 +15,8 @@ class CheckoutForm extends Component
     public $street;
     public $city;
     public $postalCode;
-    public $address;
-    public $paymentMethod;
     public $province;
+    public $paymentMethod;
 
     protected $rules = [
         'street' => ['required', 'string', 'max:255'],
@@ -25,59 +25,21 @@ class CheckoutForm extends Component
         'province' => ['required', 'string', 'max:255'],
     ];
 
-    public function processPayment()
+    public function processPayment(CheckoutService $checkoutService)
     {
         $this->validate();
 
-        $user = Auth::user();
-        $cart = $user->carts()->where('status', 'pending')->first();
-
-        if (!$cart) {
-            session()->flash('error', 'No se encontró un carrito asociado al usuario.');
+        try {
+            return $checkoutService->process(Auth::user(), [
+                'street' => $this->street,
+                'city' => $this->city,
+                'province' => $this->province,
+                'postalCode' => $this->postalCode,
+            ]);
+        } catch (\Exception $e) {
+            session()->flash('error', $e->getMessage());
             return redirect()->route('home');
         }
-
-        // Guardamos la dirección en el carrito
-        $address = "{$this->street}, {$this->city}, {$this->province}, {$this->postalCode}";
-
-        $updated = $cart->update([
-            'address' => $address,
-            'status' => 'confirmed',
-            'order_number' => $this->generateOrderNumber(),
-        ]);
-
-        if (!$updated) {
-            session()->flash('error', 'No se pudo actualizar el carrito.');
-            return redirect()->back();
-        }
-
-        // Calculamos el total (en euros, luego pasamos a céntimos)
-        $amount = $cart->cartItems->sum(function ($item) {
-            return $item->unit_price * $item->quantity;
-        });
-
-        // Creamos sesión de checkout en Stripe
-        return $user->checkout([
-            [
-                'price_data' => [
-                    'currency' => 'eur',
-                    'product_data' => [
-                        'name' => 'Compra en mi tienda #' . $cart->id,
-                    ],
-                    'unit_amount' => $amount * 100, // céntimos
-                ],
-                'quantity' => 1,
-            ]
-        ], [
-            'success_url' => route('confirmed'),
-            'cancel_url' => route('checkout-cancel'),
-        ]);
-    }
-
-    private function generateOrderNumber()
-    {
-        $date = now()->format('YmdHis'); // YYYYMMDDHHMMSS
-        return $date . '-' . mt_rand(1000, 9999); // Número aleatorio para unicidad
     }
 
     public function render()

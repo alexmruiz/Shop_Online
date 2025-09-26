@@ -10,6 +10,11 @@ class ProductService
 {
     protected $apiUrl = 'https://api.escuelajs.co/api/v1/products'; // Fake Store API
 
+    /**
+     * Importa productos desde una API externa y los guarda en la base de datos.
+     *
+     * @return bool
+     */
     public function importProducts()
     {
         $response = Http::get($this->apiUrl);
