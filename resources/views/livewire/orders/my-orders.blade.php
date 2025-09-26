@@ -60,7 +60,7 @@
                     </ul>
 
                     <!-- Botón para generar PDF -->
-                    <a href="{{ route('download.invoice', ['id' => $cart->id]) }}" wire:navigate target="_blank" class="btn btn-outline-success">
+                    <a href="{{ route('download.invoice', ['id' => $cart->id]) }}" target="_blank" class="btn btn-outline-success">
                         {{ __('orders.download_invoice') }}
                     </a>
                 </div>

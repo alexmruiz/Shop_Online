@@ -7,6 +7,7 @@ use Dompdf\Dompdf;
 use Dompdf\Options;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Response;
+use Illuminate\Support\Facades\Gate;
 
 class InvoiceService
 {
@@ -31,6 +32,9 @@ class InvoiceService
     public function downloadInvoice(int $id)
     {
         $cart = Cart::with('cartItems.product', 'user')->findOrFail($id);
+
+        //Autorización
+        Gate::authorize('view', $cart);
 
         return $this->buildPdfResponse($cart, 'inline');
     }
