@@ -43,6 +43,11 @@ class InvoiceService
        Métodos privados de soporte
        =============================== */
 
+    /**
+     * Obtiene el último carrito confirmado de un usuario.
+     * @param int $userId
+     * @return Cart|null
+     */
     private function getLatestConfirmedCart(int $userId): ?Cart
     {
         return Cart::with('cartItems.product', 'user')

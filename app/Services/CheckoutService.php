@@ -2,10 +2,12 @@
 
 namespace App\Services;
 
+use App\Jobs\Notification;
 use App\Models\User;
 use App\Models\Cart;
 use Illuminate\Support\Facades\DB;
 use Exception;
+use Illuminate\Support\Facades\Mail;
 
 class CheckoutService
 {
@@ -69,6 +71,7 @@ class CheckoutService
             'status' => 'confirmed',
             'order_number' => $this->generateOrderNumber(),
         ]);
+        Notification::dispatch($cart);
     }
 
     /**
