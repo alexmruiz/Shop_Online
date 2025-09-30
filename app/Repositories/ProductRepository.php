@@ -7,6 +7,13 @@ use App\Models\Category;
 
 class ProductRepository
 {
+    /**
+     * Busca y filtra productos por categoría y término de búsqueda, también paginados.
+     * @param mixed $search
+     * @param mixed $category
+     * @param int $perPage
+     * @return \Illuminate\Contracts\Pagination\LengthAwarePaginator
+     */
     public function searchAndFilter(?string $search, ?int $category, int $perPage)
     {
         $query = Product::query();
