@@ -12,10 +12,10 @@ use Livewire\Component;
 #[Layout('components.layouts.app_public')]
 class CheckoutForm extends Component
 {
-    public string $street;
-    public string $city;
-    public string $postalCode;
-    public string $province;
+    public string $street = '';
+    public string $city = '';
+    public int $postalCode = 0;
+    public string $province = '';
     public bool $saveAsDefault = true;
 
     protected $rules = [
@@ -24,6 +24,18 @@ class CheckoutForm extends Component
         'postalCode' => ['required', 'digits:5'],
         'province' => ['required', 'string', 'max:255'],
     ];
+
+    public function mount()
+    {
+        $address = Auth::user()->address;
+        
+        if (!empty($address)) {
+            $this->street = $address['city'] ?? '';
+            $this->city = $address['street'] ?? '';
+            $this->postalCode = $address['postalCode'] ?? 0;
+            $this->province = $address['province'] ?? '';
+        }
+    }
 
     public function processPayment(CheckoutService $checkoutService)
     {

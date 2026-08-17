@@ -20,11 +20,16 @@ class CheckoutService
         try {
             $cart = $this->getPendingCart($user);
 
-            $address = $this->formatAddress($addressData);
-
-            if(!empty($saveStreet)) {
-                $user->update(['address' => $address]);
+            if (!empty($saveStreet)) {
+                $user->update(['address' => [
+                    'street' => $addressData['street'],
+                    'city' => $addressData['city'],
+                    'province' => $addressData['province'],
+                    'postalCode' => $addressData['postalCode']
+                ]]);
             }
+
+            $address = $this->formatAddress($addressData);
 
             $this->cartStateManager($cart, $address);
 
