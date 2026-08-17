@@ -27,11 +27,25 @@
                             @error('province') <span class="text-danger small">{{ $message }}</span> @enderror
                         </div>
                     </div>
+                         <!-- Switch / Checkbox para Guardar Dirección Predeterminada -->
+                    <div class="form-check mb-3">
+                        <input
+                            class="form-check-input"
+                            type="checkbox"
+                            id="saveAsDefault"
+                            wire:model.defer="saveAsDefault"
+                        >
+                        <label class="form-check-label" for="saveAsDefault">
+                            Guardar esta dirección como predeterminada
+                        </label>
+                    </div>
 
                     <!-- Botón de Finalizar -->
-                    <button type="submit" class="btn btn-primary w-100 mt-4">
-                        {{ __('checkout.confirm_purchase') }}
-                    </button>
+                    <div class="d-flex justify-content-end mt-4">
+                        <button type="submit" class="btn btn-primary px-4">
+                            {{ __('checkout.confirm_purchase') }}
+                        </button>
+                    </div>
                 </form>
             </div>
         </div>

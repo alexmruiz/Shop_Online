@@ -16,6 +16,7 @@ class CheckoutForm extends Component
     public string $city;
     public string $postalCode;
     public string $province;
+    public bool $saveAsDefault = true;
 
     protected $rules = [
         'street' => ['required', 'string', 'max:255'],
@@ -34,7 +35,7 @@ class CheckoutForm extends Component
                 'city' => $this->city,
                 'province' => $this->province,
                 'postalCode' => $this->postalCode,
-            ]);
+            ], $this->saveAsDefault);
         } catch (\Exception $e) {
             session()->flash('error', $e->getMessage());
             return redirect()->route('home');

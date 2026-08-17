@@ -15,12 +15,16 @@ class CheckoutService
      * @param \App\Models\User $user
      * @param array $addressData
      */
-    public function process(User $user, array $addressData)
+    public function process(User $user, array $addressData, bool $saveStreet = false)
     {
         try {
             $cart = $this->getPendingCart($user);
 
             $address = $this->formatAddress($addressData);
+
+            if(!empty($saveStreet)) {
+                $user->update(['address' => $address]);
+            }
 
             $this->cartStateManager($cart, $address);
 
