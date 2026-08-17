@@ -21,4 +21,8 @@ return [
     'cvv' => 'CVV',
     'cvv_placeholder' => '3 dígitos',
     'confirm_purchase' => 'Confirmar Compra',
+
+    'save_as_default_info' => 'Se guardará esta dirección como predeterminada.',
+    'address_changed_info' => 'Se han detectado cambios. Se actualizará la dirección al confirmar.',
+    'address_saved_info' => 'Dirección guardada. Realiza cambios si deseas actualizarla.',
 ];

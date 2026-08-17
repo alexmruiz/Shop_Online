@@ -21,4 +21,9 @@ return [
     'cvv' => 'CVV',
     'cvv_placeholder' => '3 digits',
     'confirm_purchase' => 'Confirm Purchase',
+
+    // New keys for address state
+    'save_as_default_info' => 'This address will be saved as default.',
+    'address_changed_info' => 'Changes detected. Address will be updated upon confirmation.',
+    'address_saved_info' => 'Address saved. Make changes if you wish to update it.',
 ];
