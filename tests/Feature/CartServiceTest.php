@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Enums\CartStatus;
 use App\Models\Cart;
 use App\Models\Product;
 use App\Models\User;
@@ -36,7 +37,7 @@ class CartServiceTest extends TestCase
 
         // Comprobamos que se ha creado correctamente
         $this->assertInstanceOf(Cart::class, $cart);
-        $this->assertEquals('pending', $cart->status);
+        $this->assertEquals(CartStatus::PENDING, $cart->status);
 
         // Refrescamos el usuario para que cargue las relaciones desde la DB
         $user->refresh();

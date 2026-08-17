@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Enums\CartStatus;
 use App\Jobs\Notification;
 use App\Models\User;
 use App\Models\Cart;
@@ -39,7 +40,7 @@ class CheckoutService
      */
     private function getPendingCart(User $user): Cart
     {
-        $cart = $user->carts()->where('status', 'pending')->first();
+        $cart = $user->carts()->where('status', CartStatus::PENDING)->first();
 
         if (!$cart) {
             throw new Exception('No se encontró un carrito asociado al usuario.');
@@ -71,7 +72,7 @@ class CheckoutService
     {
         if (!empty($isAcepted)) {
             $cart->update([
-                'status' => 'confirmed',
+                'status' => CartStatus::CONFIRMED,
                 'order_number' => $this->generateOrderNumber(),
             ]);
             Notification::dispatch($cart);
@@ -103,7 +104,7 @@ class CheckoutService
     private function createCheckoutSession(User $user, Cart $cart, int $amount)
     {
         // Cambiar estado a "processing" ANTES de crear la sesión
-        $cart->update(['status' => 'processing']);
+        $cart->update(['status' => CartStatus::PROCESSING]);
 
         return $user->checkout([[
             'price_data' => [

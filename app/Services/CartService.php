@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Enums\CartStatus;
 use App\Models\Cart;
 use App\Models\Product;
 use Illuminate\Support\Facades\Auth;
@@ -22,7 +23,7 @@ class CartService
             if (!$cart) {
                 $cart = Cart::create([
                     'user_id' => $user->id,
-                    'status' => 'pending',
+                    'status' => CartStatus::PENDING,
                 ]);
             }
             return $cart;
