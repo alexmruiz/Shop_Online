@@ -28,14 +28,14 @@
                         </div>
                     </div>
 
-                    <!-- Mensaje / Indicador de estado de dirección -->
+                   <!-- Mensaje / Indicador de estado de dirección -->
                     <div class="mb-3">
                         @if(empty(array_filter($originalAddress)))
-                            <p class="text-info small mb-0">Se guardará esta dirección como predeterminada.</p>
+                            <p class="text-info small mb-0">{{ __('checkout.save_as_default_info') }}</p>
                         @elseif($this->hasChanges)
-                            <p class="text-warning small mb-0">Se han detectado cambios. Se actualizará la dirección al confirmar.</p>
+                            <p class="text-warning small mb-0">{{ __('checkout.address_changed_info') }}</p>
                         @else
-                            <p class="text-muted small mb-0">Dirección guardada. Realiza cambios si deseas actualizarla.</p>
+                            <p class="text-muted small mb-0">{{ __('checkout.address_saved_info') }}</p>
                         @endif
                     </div>
 
