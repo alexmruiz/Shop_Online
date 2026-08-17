@@ -2,6 +2,7 @@
 
 namespace App\Livewire\Cart;
 
+use App\Enums\CartStatus;
 use App\Facades\InvoiceFacade;
 use App\Models\Cart;
 use App\Services\CheckoutService;
@@ -27,7 +28,7 @@ class CartConfirmed extends Component
         if ($cartId) {
             $this->cart = Auth::user()->carts()->find($cartId);
         } else {
-            $this->cart = Auth::user()->carts()->where('status', 'processing')->latest()->first();
+            $this->cart = Auth::user()->carts()->where('status', CartStatus::PROCESSING)->latest()->first();
         }
 
         if (!$this->cart) {

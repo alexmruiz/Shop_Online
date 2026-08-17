@@ -2,6 +2,7 @@
 
 namespace Database\Factories;
 
+use App\Enums\CartStatus;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Str;
@@ -22,7 +23,7 @@ class CartFactory extends Factory
             'user_id' => User::factory(),
             'order_number' => Str::random(10),
             'address' => $this->faker->address(),
-            'status' => $this->faker->randomElement(['pending','confirmed', 'sent']),
+            'status' => $this->faker->randomElement([CartStatus::PENDING,CartStatus::CONFIRMED, 'sent']),
         ];
     }
 }

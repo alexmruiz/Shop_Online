@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Enums\CartStatus;
 use App\Models\Cart;
 use Dompdf\Dompdf;
 use Dompdf\Options;
@@ -52,7 +53,7 @@ class InvoiceService
     {
         return Cart::with('cartItems.product', 'user')
             ->where('user_id', $userId)
-            ->where('status', 'confirmed')
+            ->where('status', CartStatus::CONFIRMED)
             ->latest()
             ->first();
     }

@@ -2,6 +2,7 @@
 
 namespace App\Repositories;
 
+use App\Enums\CartStatus;
 use App\Models\User;
 use Illuminate\Pagination\LengthAwarePaginator;
 
@@ -18,7 +19,7 @@ class OrderRepository
             $query->where('order_number', 'like', '%' . $search . '%');
         }
 
-        return $query->where('status', '!=', 'pending')
+        return $query->where('status', '!=', CartStatus::PENDING)
             ->orderBy('id', 'desc')
             ->paginate($perPage);
     }

@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Enums\CartStatus;
 use App\Models\Cart;
 use App\Models\CartItem;
 use App\Models\Product;
@@ -48,7 +49,7 @@ class InvoiceServiceTest extends TestCase
         // Crear carrito confirmado con un producto
         $cart = Cart::factory()->create([
             'user_id' => $user->id,
-            'status' => 'confirmed',
+            'status' => CartStatus::CONFIRMED,
             'order_number' => '12345',
             'address' => 'Calle de prueba 1',
         ]);
