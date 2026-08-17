@@ -12,11 +12,10 @@ use Livewire\Component;
 #[Layout('components.layouts.app_public')]
 class CheckoutForm extends Component
 {
-    public $street;
-    public $city;
-    public $postalCode;
-    public $province;
-    public $paymentMethod;
+    public string $street;
+    public string $city;
+    public string $postalCode;
+    public string $province;
 
     protected $rules = [
         'street' => ['required', 'string', 'max:255'],
