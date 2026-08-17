@@ -5,9 +5,7 @@ namespace App\Services;
 use App\Jobs\Notification;
 use App\Models\User;
 use App\Models\Cart;
-use Illuminate\Support\Facades\DB;
 use Exception;
-use Illuminate\Support\Facades\Mail;
 
 class CheckoutService
 {
@@ -18,17 +16,19 @@ class CheckoutService
      */
     public function process(User $user, array $addressData)
     {
-        return DB::transaction(function () use ($user, $addressData) {
+        try {
             $cart = $this->getPendingCart($user);
 
             $address = $this->formatAddress($addressData);
 
-            $this->confirmCart($cart, $address);
+            $this->cartStateManager($cart, $address);
 
             $amount = $this->calculateTotal($cart);
 
             return $this->createCheckoutSession($user, $cart, $amount);
-        });
+        } catch (\Throwable $th) {
+            throw $th;
+        }
     }
 
     /**
@@ -59,19 +59,28 @@ class CheckoutService
     }
 
     /**
-     * Summary of confirmCart
-     * @param \App\Models\Cart $cart
+     * Maneja el estado del carrito antes y despues del proceso de pago
+     *
+     * @param Cart $cart
      * @param string $address
+     * @param boolean $isAcepted
+     * @param boolean $isCancelled
      * @return void
      */
-    private function confirmCart(Cart $cart, string $address): void
+    public function cartStateManager(Cart $cart, string $address, bool $isAcepted = false, bool $isCancelled = false): void
     {
-        $cart->update([
-            'address' => $address,
-            'status' => 'confirmed',
-            'order_number' => $this->generateOrderNumber(),
-        ]);
-        Notification::dispatch($cart);
+        if (!empty($isAcepted)) {
+            $cart->update([
+                'status' => 'confirmed',
+                'order_number' => $this->generateOrderNumber(),
+            ]);
+            Notification::dispatch($cart);
+        } elseif (!empty($isCancelled)) {
+            $cart->update(['status' => 'pending']);
+        } else {
+            // Solo guardar dirección, el estado se cambia en createCheckoutSession
+            $cart->update(['address' => $address]);
+        }
     }
 
     /**
@@ -93,6 +102,9 @@ class CheckoutService
      */
     private function createCheckoutSession(User $user, Cart $cart, int $amount)
     {
+        // Cambiar estado a "processing" ANTES de crear la sesión
+        $cart->update(['status' => 'processing']);
+
         return $user->checkout([[
             'price_data' => [
                 'currency' => 'eur',
@@ -103,8 +115,8 @@ class CheckoutService
             ],
             'quantity' => 1,
         ]], [
-            'success_url' => route('confirmed'),
-            'cancel_url' => route('checkout-cancel'),
+            'success_url' => route('confirmed', ['cart_id' => $cart->id]),
+            'cancel_url' => route('checkout-cancel', ['cart_id' => $cart->id]),
         ]);
     }
 

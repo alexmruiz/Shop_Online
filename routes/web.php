@@ -14,6 +14,8 @@ use App\Livewire\Client\ClientShow;
 use App\Livewire\Orders\MyOrders;
 use App\Livewire\Product\ProductShow;
 use App\Livewire\Product\PublicProducts;
+use App\Services\CheckoutService;
+use Illuminate\Http\Request;
 
 Route::middleware(['locale'])->group(function () {
 
@@ -86,8 +88,13 @@ Route::middleware(['locale'])->group(function () {
         Route::get('/invoice/download/{id}', [MyOrders::class, 'downloadInvoice'])->name('download.invoice');
 
         //Pago cancelado
-        Route::get('/checkout-cancel', function () {
-            return view('checkout-cancel');
+        Route::get('/checkout-cancel', function (Request $request, CheckoutService $checkoutService) {
+            $cartId = $request->get('cart_id');
+            $cart = Auth::user()->carts()->find($cartId);
+            if (!empty($cart)) {
+                $checkoutService->cartStateManager($cart, '', false, true);
+            }
+            return redirect()->route('home');
         })->name('checkout-cancel');
     });
 });
