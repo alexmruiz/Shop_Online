@@ -23,7 +23,7 @@ class CartFactory extends Factory
             'user_id' => User::factory(),
             'order_number' => Str::random(10),
             'address' => $this->faker->address(),
-            'status' => $this->faker->randomElement([CartStatus::PENDING,CartStatus::CONFIRMED, 'sent']),
+            'status' => $this->faker->randomElement([CartStatus::PENDING,CartStatus::PROCESSING, CartStatus::CONFIRMED]),
         ];
     }
 }
