@@ -2,6 +2,7 @@
 
 namespace App\Livewire\Client;
 
+use App\Http\Requests\UserRequest;
 use App\Models\User;
 use Livewire\Component;
 use Livewire\Attributes\Title;
@@ -15,61 +16,38 @@ class ClientComponent extends Component
     protected $paginationTheme = 'bootstrap';
 
     //Propiedades de la clase
-    public $totalRegistros = 0;
-    public $search = '';
-    public $cant = 5;
-    //Propiedades modelo
-    public $Id = 0;
-    public $name;
-    public $email;
-    public $password;
-    public $confirmpassword;
-    public $role;
+    public int $totalRegistros = 0;
+    public string $search = '';
+    public int $cant = 5;
 
-    public $selectedUser;
+    //Propiedades modelo
+    public int $userId = 0;
+    public string $name;
+    public string $email;
+    public string $password;
+    public string $confirmpassword;
+    public string $role;
+
+    public string $selectedUser;
 
     public function create()
     {
-
-        $this->Id = 0;
+        $this->userId = 0;
 
         $this->clean();
 
         $this->dispatch('open-modal', 'modalClient');
     }
-    //Crear productos
-    public function store()
+
+    /**
+     * Valida y crea un usuario
+     *
+     * @param UserRequest $request
+     * @return void
+     */
+    public function store(UserRequest $request): void
     {
-
-        $rules = [
-            'name' => 'required|min:5|max:255',
-            'email' => 'required|email|max:255|unique:users,email',
-            'password' => 'required|min:6',
-            'confirmpassword' => 'required|same:password',
-            'role' => 'required',
-        ];
-        $messages = [
-            'name.required' => 'El nombre del usuario es obligatorio.',
-            'name.min' => 'El nombre debe tener al menos 5 caracteres.',
-            'name.max' => 'El nombre no puede exceder los 255 caracteres.',
-            'name.unique' => 'El nombre ya está registrado en nuestra base de datos.',
-
-            'email.required' => 'El correo electrónico es obligatorio',
-            'email.email' => 'El correo electrónico debe ser una dirección válida.',
-            'email.max' => 'El correo electrónico no puede exceder los 255 caracteres.',
-            'email.unique' => 'El correo electrónico ya está registrado en nuestra base de datos.',
-
-            'password.required' => 'La contraseña es obligatoria',
-            'password.min' => 'La contraseña debe de contener 6 caracteres mínimo',
-
-            'confirmpassword.required' => 'La confirmación de contraseña es obligatoria.',
-            'confirmpassword.same' => 'La confirmación de contraseña debe coincidir con la contraseña.',
-
-            'role.required' => 'Debes elegir un rol.',
-        ];
-
-
-        $this->validate($rules, $messages);
+        $request->validated();
 
         $user = new User();
 
@@ -84,11 +62,16 @@ class ClientComponent extends Component
         $this->clean();
     }
 
-    public function edit(User $user)
+    /**
+     * Setea los valores del modal y lo abre
+     *
+     * @param User $user
+     * @return void
+     */
+    public function edit(User $user): void
     {
-
         $this->clean();
-        $this->Id = $user->id;
+        $this->userId = $user->id;
         $this->name = $user->name;
         $this->email = $user->email;
         $this->password = $user->password;
@@ -98,36 +81,16 @@ class ClientComponent extends Component
         $this->dispatch('open-modal', 'modalClient');
     }
 
-    public function update(User $user)
+    /**
+     * Valida y actualiza un usuario
+     *
+     * @param User $user
+     * @param UserRequest $request
+     * @return void
+     */
+    public function update(User $user, UserRequest $request): void
     {
-        $rules = [
-            'name' => 'required|min:3|max:255',
-            'email' => "required|email|max:255|unique:users,email,{$user->id}",
-            'password' => 'required|min:6', // Contraseña opcional durante la edición
-            'confirmpassword' => 'required|same:password', // Opcional, pero debe coincidir si se proporciona
-            'role' => 'required|string|max:255',
-        ];
-        //unique:users,email,{$user->id}
-
-        $messages = [
-            'name.required' => 'El nombre del usuario es obligatorio.',
-            'name.min' => 'El nombre debe tener al menos 3 caracteres.',
-            'name.max' => 'El nombre no puede exceder los 255 caracteres.',
-            'name.unique' => 'El nombre ya está registrado en nuestra base de datos.',
-
-            'email.required' => 'El correo electrónico es obligatorio.',
-            'email.email' => 'El correo electrónico debe ser una dirección válida.',
-            'email.max' => 'El correo electrónico no puede exceder los 255 caracteres.',
-            'email.unique' => 'El correo electrónico ya está registrado en nuestra base de datos.',
-
-            'password.required' => 'La contraseña es obligatoria',
-            'password.min' => 'La contraseña debe contener al menos 6 caracteres.',
-            'confirmpassword.same' => 'La confirmación de contraseña no coincide con la nueva contraseña.',
-
-            'role.required' => 'Debes elegir un rol.',
-        ];
-
-        $this->validate($rules, $messages);
+        $request->validated();
 
         $user->update([
             'name' => $this->name,
@@ -146,7 +109,7 @@ class ClientComponent extends Component
     public function clean()
     {
         $this->reset([
-            'Id',
+            'userId',
             'name',
             'email',
             'password',
@@ -157,7 +120,7 @@ class ClientComponent extends Component
     }
 
     #[On('destroyClient')]
-    public function destroy($id)
+    public function destroy(int $id): void
     {
         $user = User::findOrFail($id);
         $user->delete();
