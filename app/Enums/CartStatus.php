@@ -8,4 +8,5 @@ enum CartStatus: string
     case PROCESSING = 'processing';
     case CONFIRMED = 'confirmed';
     case CANCELLED = 'cancelled';
+    case COMPLETED = 'completed';
 }
