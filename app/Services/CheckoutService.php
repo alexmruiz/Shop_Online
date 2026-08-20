@@ -137,6 +137,6 @@ class CheckoutService
     private function generateOrderNumber(): string
     {
         $date = now()->format('YmdHis');
-        return $date . '-' . mt_rand(1000, 9999);
+        return $date . '-' . random_int(1000, 9999);
     }
 }

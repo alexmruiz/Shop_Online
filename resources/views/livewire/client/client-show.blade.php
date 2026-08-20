@@ -1,3 +1,4 @@
+@use('App\Enums\CartStatus')
 <div class="container mt-4 mb-4">
     <x-card cardTitle="Detalles del Cliente">
         <div class="card-body">
@@ -18,8 +19,8 @@
                 </h5>
                 <p>
                     <span class="text-secondary">Estado:</span>
-                    <strong class="badge {{ $cart->status === 'completed' ? 'bg-success' : 'bg-warning' }}">
-                        {{ ucfirst($cart->status) }}
+                    <strong class="badge {{ $cart->status === CartStatus::COMPLETED ? 'bg-success' : 'bg-warning' }}">
+                        {{ $cart->status }}
                     </strong>
                 </p>
                 <p>

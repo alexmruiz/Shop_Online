@@ -20,12 +20,12 @@ class ProductComponent extends Component
     protected $paginationTheme = 'bootstrap'; // Configura el tema de paginación a Bootstrap
 
     // Propiedades de la clase
-    public $totalRegistros = 0;
-    public $search = '';
-    public $cant = 5;
+    public int $totalRegistros = 0;
+    public string $search = '';
+    public int $cant = 5;
 
     // Propiedades del modelo
-    public $name;
+    public string $name;
     public $Id = 0;
     public $category_id;
     public $description;
