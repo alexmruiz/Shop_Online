@@ -10,12 +10,10 @@ use Livewire\Attributes\On;
 
 /**
  * Componente Livewire para gestionar las categorías.
- * 
  * Este componente permite listar, crear, editar y eliminar categorías.
  * Integra paginación y búsqueda, y utiliza eventos Livewire para interactuar
  * con el frontend.
  */
-
 #[Title('Categorias')]
 class CategoryComponent extends Component
 {
@@ -27,7 +25,7 @@ class CategoryComponent extends Component
     public $cant = 5;
     //Propiedades modelo
     public $name = '';
-    public $Id;
+    public int $categoryId;
 
     public function render()
     {
@@ -46,14 +44,10 @@ class CategoryComponent extends Component
         ]);
     }
 
-    public function mount() {}
-
     //Abre el modal
     public function create()
     {
-
-        $this->Id = 0;
-
+        $this->categoryId = 0;
         $this->reset(['name']);
         $this->resetErrorBag();
         $this->dispatch('open-modal', 'modalCategory');
@@ -61,7 +55,6 @@ class CategoryComponent extends Component
 
     /**
      * Guarda una nueva categoría en la base de datos.
-     * 
      * Valida los datos antes de guardarlos y notifica al usuario del resultado.
      */
     public function store()
@@ -98,7 +91,7 @@ class CategoryComponent extends Component
     {
 
         $this->reset(['name']);
-        $this->Id = $category->id;
+        $this->categoryId = $category->id;
 
         $this->name = $category->name;
 
@@ -114,7 +107,7 @@ class CategoryComponent extends Component
     {
 
         $rules = [
-            'name' => 'required|min:5|max:255|unique:categories,id,' . $this->Id
+            'name' => 'required|min:5|max:255|unique:categories,id,' . $this->categoryId
         ];
         $messages = [
             'name.required' => 'El nombre es requerido',
