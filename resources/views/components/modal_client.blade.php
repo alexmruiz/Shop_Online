@@ -1,5 +1,5 @@
 <x-modal modalId="modalClient" modalTitle="Clientes" modalSize="modal-lg">
-    <form wire:submit.prevent="{{ $Id == 0 ? 'store' : 'update' }}">
+    <form wire:submit.prevent="{{ $userId == 0 ? 'store' : 'update' }}">
         <div class="form-row">
             {{-- Input Name --}}
             <div class="form-group col-md-6">
@@ -53,7 +53,7 @@
         </div>
         <hr>
         <button wire:loading.attr="disabled" class="btn btn-primary float-right">
-            {{ $Id == 0 ? 'Guardar' : 'Editar' }}
+            {{ $userId == 0 ? 'Guardar' : 'Editar' }}
         </button>
     </form>
 </x-modal>
