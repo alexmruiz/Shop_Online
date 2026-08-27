@@ -2,6 +2,7 @@
 
 namespace App\Livewire\Cart;
 
+use App\Enums\CartStockActions;
 use App\Facades\Cart as CartFacade;
 use Livewire\Attributes\Layout;
 use Livewire\Attributes\Title;
@@ -45,7 +46,7 @@ class CartComponent extends Component
      */
     public function increaseQuantity($itemId)
     {
-        CartFacade::increaseQuantity($itemId);
+        CartFacade::updateStockProduct($itemId, CartStockActions::INCREMENT);
         $this->loadCart();
     }
 
@@ -56,7 +57,7 @@ class CartComponent extends Component
      */
     public function decreaseQuantity($itemId)
     {
-        CartFacade::decreaseQuantity($itemId);
+        CartFacade::updateStockProduct($itemId, CartStockActions::DECREMENT);
         $this->loadCart();
     }
 
@@ -67,7 +68,7 @@ class CartComponent extends Component
      */
     public function removeFromCart($itemId)
     {
-        CartFacade::removeFromCart($itemId);
+        CartFacade::updateStockProduct($itemId, CartStockActions::DELETE);
         $this->loadCart();
     }
 
