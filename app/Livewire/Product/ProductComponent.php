@@ -27,7 +27,7 @@ class ProductComponent extends Component
     // Propiedades del modelo
     public string $name;
     public $Id = 0;
-    public $category_id;
+    public int $category_id;
     public $description;
     public $price;
     public $is_active = 1;
