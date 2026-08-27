@@ -12,4 +12,5 @@ return [
     'no_products' => 'Categoría sin productos',
     'add_to_cart' => 'Añadir al carrito',
     'added_to_cart' => ':product añadido al carrito',
+    'out_of_stock' => 'Sin stock'
 ];

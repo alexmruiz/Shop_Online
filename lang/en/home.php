@@ -12,4 +12,5 @@ return [
     'no_products' => 'No products in this category',
     'add_to_cart' => 'Add to cart',
     'added_to_cart' => ':product added to cart',
+    'out_of_stock' => 'Out of stock'
 ];
