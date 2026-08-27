@@ -28,6 +28,13 @@ class DatabaseSeeder extends Seeder
             'role' => 'admin',
         ]);
 
+        User::factory(1)->create([
+            'name' => 'Test User',
+            'email' => 'test@testuser.com',
+            'password' => bcrypt('testuser'),
+            'role' => 'user',
+        ]);
+
         // Crear categorías y productos
         Category::factory(10)->create()->each(function ($category) {
             Product::factory(5)->create(['category_id' => $category->id]);
