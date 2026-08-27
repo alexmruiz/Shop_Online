@@ -5,7 +5,9 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Casts\Attribute;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Database\Eloquent\Builder;
 
 class Product extends Model
 {
@@ -18,7 +20,8 @@ class Product extends Model
         'is_active',
         'image',
         'category_id',
-        'external_id'
+        'external_id',
+        'stock'
     ];
 
     /**
@@ -59,5 +62,21 @@ class Product extends Model
             ->orderByDesc('total_sold')
             ->limit($limit)
             ->get();
+    }
+
+    /**
+     * Solo pueder ver los productos inactivos los usuarios con rol admin
+     *
+     * @return void
+     */
+    protected static function booted(): void
+    {
+        static::addGlobalScope('activeForRegularUsers', function (Builder $builder) {
+            $user = Auth::user();
+
+            if (!$user || $user->role == 'user') {
+                $builder->where('is_active', true);
+            }
+        });
     }
 }
