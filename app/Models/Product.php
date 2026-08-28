@@ -2,14 +2,14 @@
 
 namespace App\Models;
 
-use App\Models\Scopes\ActiveForRegularUsersScope;
+use App\Models\Scopes\ActiveProductScope;
+use Illuminate\Database\Eloquent\Attributes\ScopedBy;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Casts\Attribute;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Database\Eloquent\Builder;
 
+#[ScopedBy(ActiveProductScope::class)]
 class Product extends Model
 {
     use HasFactory;
@@ -65,8 +65,4 @@ class Product extends Model
             ->get();
     }
 
-    protected static function booted(): void
-{
-    static::addGlobalScope(new ActiveForRegularUsersScope());
-}
 }
