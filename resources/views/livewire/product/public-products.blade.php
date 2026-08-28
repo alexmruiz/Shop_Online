@@ -58,42 +58,77 @@
                             <!-- Imagen del Producto -->
                             <x-image-product :product="$product" class="image-product" />
 
-                            <!-- Detalles del Producto -->
+                           <!-- Detalles del Producto -->
                             <div class="card-body d-flex flex-column text-center">
                                 <h5 class="card-title text-dark fw-bold">{{ $product->name }}</h5>
+                                
                                 <p class="card-text text-muted small">
-                                    {{ Str::limit($product->description, 100, '...') }}</p>
-                                <p class="card-text fw-bold text-primary">{{ number_format($product->price, 2) }} €</p>
+                                    {{ Str::limit($product->description, 100, '...') }}
+                                </p>
+
+                                <p class="card-text fw-bold text-primary fs-5">{{ number_format($product->price, 2) }} €</p>
+
+                                {{-- Indicadores de stock --}}
+                                @if ($product->stock > 0 && $product->stock <= 5)
+                                    <p class="card-text fw-bold text-danger small">
+                                        <i class="bi bi-exclamation-triangle-fill"></i> ¡Solo quedan {{ $product->stock }} uds!
+                                    </p>
+                                @endif
 
                                 <!-- Botón Añadir al Carrito -->
-                                @auth
-                                    <div class="mt-auto">
-                                        <a href="#" wire:click.prevent="addToCart('{{ $product->id }}')"
-                                            class="btn btn-primary w-100 mt-2">
-                                            {{ __('home.add_to_cart') }}
-                                        </a>
-                                    </div>
-                                @endauth
-                                @guest
-                                    <div class="mt-auto">
-                                        <a href="{{ route('login') }}" class="btn btn-primary w-100 mt-2">
-                                            {{ __('home.add_to_cart') }}
-                                        </a>
-                                    </div>
-                                @endguest
+                                <div class="mt-auto">
+                                    @auth
+                                        @if ($product->stock > 0)
+                                            <button type="button" 
+                                                    wire:click.prevent="addToCart({{ $product->id }})"
+                                                    wire:loading.attr="disabled"
+                                                    class="btn btn-primary w-100 mt-2">
+                                                <span wire:loading.remove wire:target="addToCart({{ $product->id }})">
+                                                    <i class="bi bi-cart-plus me-1"></i> {{ __('home.add_to_cart') }}
+                                                </span>
+                                                <span wire:loading wire:target="addToCart({{ $product->id }})">
+                                                    <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                                                </span>
+                                            </button>
+                                        @else
+                                            <button type="button" class="btn btn-secondary w-100 mt-2" disabled>
+                                                <i class="bi bi-slash-circle me-1"></i> {{ __('home.out_of_stock') }}
+                                            </button>
+                                        @endif
+                                    @endauth
+
+                                    @guest
+                                        @if ($product->stock > 0)
+                                            <a href="{{ route('login') }}" class="btn btn-primary w-100 mt-2">
+                                                <i class="bi bi-cart-plus me-1"></i> {{ __('home.add_to_cart') }}
+                                            </a>
+                                        @else
+                                            <button type="button" class="btn btn-secondary w-100 mt-2" disabled>
+                                                <i class="bi bi-slash-circle me-1"></i> {{ __('home.out_of_stock') }}
+                                            </button>
+                                        @endif
+                                    @endguest
+                                </div>
+
+                                <!-- Feedback Alpine.js al añadir -->
                                 <div x-data="{ show: false, message: '' }"
                                     x-on:product-add.window="
-                                        if ($event.detail.id == {{ $product->id }}) {
+                                        const eventDetail = Array.isArray($event.detail) ? $event.detail[0] : $event.detail;
+                                        if (eventDetail.id == {{ $product->id }}) {
                                             show = true; 
                                             message = '{{ __("home.added_to_cart", ["product" => $product->name]) }}'; 
                                             setTimeout(() => show = false, 3000);
                                         }
-                                    ">
-                                    <div x-show="show" x-transition class="alert alert-success small mt-2">
-                                        <span x-text="message"></span>
+                                    "
+                                    class="mt-2">
+                                    <div x-show="show" 
+                                        x-transition 
+                                        x-cloak 
+                                        class="alert alert-success small py-1 px-2 mb-0" 
+                                        role="alert">
+                                        <i class="bi bi-check-circle-fill me-1"></i> <span x-text="message"></span>
                                     </div>
                                 </div>
-
                             </div>
                         </div>
                     </div>

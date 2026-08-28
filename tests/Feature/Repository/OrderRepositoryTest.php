@@ -1,6 +1,7 @@
 <?php
 
-namespace Tests\Feature;
+namespace Tests\Feature\Repository;
+
 
 use App\Models\Cart;
 use App\Models\User;

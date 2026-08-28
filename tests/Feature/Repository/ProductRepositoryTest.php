@@ -1,6 +1,7 @@
 <?php
 
-namespace Tests\Unit;
+namespace Tests\Feature\Repository;
+
 
 use Tests\TestCase;
 use App\Models\Product;

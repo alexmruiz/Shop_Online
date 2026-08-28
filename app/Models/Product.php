@@ -2,10 +2,13 @@
 
 namespace App\Models;
 
+use App\Models\Scopes\ActiveForRegularUsersScope;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Casts\Attribute;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Database\Eloquent\Builder;
 
 class Product extends Model
 {
@@ -18,7 +21,8 @@ class Product extends Model
         'is_active',
         'image',
         'category_id',
-        'external_id'
+        'external_id',
+        'stock'
     ];
 
     /**
@@ -60,4 +64,9 @@ class Product extends Model
             ->limit($limit)
             ->get();
     }
+
+    protected static function booted(): void
+{
+    static::addGlobalScope(new ActiveForRegularUsersScope());
+}
 }

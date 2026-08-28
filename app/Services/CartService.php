@@ -3,9 +3,11 @@
 namespace App\Services;
 
 use App\Enums\CartStatus;
+use App\Enums\CartStockActions;
 use App\Models\Cart;
 use App\Models\Product;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 
 class CartService
 {
@@ -14,12 +16,12 @@ class CartService
      *
      * @return Cart|null
      */
-    public function getOrCreatePendingCart()
+    public function getOrCreatePendingCart(): ?Cart
     {
         $user = Auth::user();
         if ($user) {
             // Buscar el carrito con estado "pending" o crear uno nuevo
-            $cart = $user->carts()->where('status', 'pending')->first();
+            $cart = Cart::where('user_id', $user->id)->where('status', CartStatus::PENDING)->first();
             if (!$cart) {
                 $cart = Cart::create([
                     'user_id' => $user->id,
@@ -37,79 +39,75 @@ class CartService
      * @param int $productId
      * @return void
      */
-    public function addToCart($productId)
+    public function addToCart(int $productId): void
     {
-        $product = Product::find($productId);
         $cart = $this->getOrCreatePendingCart();
 
-        if ($cart) {
-            $cartItem = $cart->cartItems()->where('product_id', $productId)->first();
-            if ($cartItem) {
-                $cartItem->increment('quantity');
-            } else {
-                $cart->cartItems()->create([
-                    'product_id' => $product->id,
-                    'quantity' => 1,
-                    'unit_price' => $product->price,
-                ]);
-            }
+        if (empty($cart)) {
+            return;
         }
-    }
 
-    /**
-     * Incrementa la cantidad de un producto en el carrito.
-     *
-     * @param int $itemId
-     * @return void
-     */
-    public function increaseQuantity($itemId)
-    {
-        $cart = $this->getOrCreatePendingCart();
+        DB::transaction(function () use ($productId, $cart) {
 
-        if ($cart) {
-            $item = $cart->cartItems()->find($itemId);
-            if ($item) {
-                $item->increment('quantity');
-            }
-        }
-    }
+            $product = Product::lockForUpdate()->findOrFail($productId);
 
-    /**
-     * Decrementa la cantidad de un producto en el carrito.
-     *
-     * @param int $itemId
-     * @return void
-     */
-    public function decreaseQuantity($itemId)
-    {
-        $cart = $this->getOrCreatePendingCart();
-        if ($cart) {
-            $item = $cart->cartItems()->find($itemId);
-            if ($item) {
-                if ($item->quantity > 1) {
-                    $item->decrement('quantity');
+            $stock = !empty($product) ? $product->stock : 0;
+
+            if (!empty($stock)) {
+
+                $cartItem = $cart->cartItems()->where('product_id', $productId)->first();
+                if (!empty($cartItem)) {
+                    $cartItem->increment('quantity');
                 } else {
-                    $this->removeFromCart($itemId);
+                    $cart->cartItems()->create([
+                        'product_id' => $product->id,
+                        'quantity' => 1,
+                        'unit_price' => $product->price,
+                    ]);
                 }
+
+                $product->decrement('stock');
             }
-        }
+        });
     }
 
     /**
-     * Elimina un producto del carrito.
+     * Actualiza el stock de un producto tanto en Product como en Cart.
      *
-     * @param int $itemId
-     * @return void
+     * @param integer $itemId
+     * @param CartStockActions $mode
      */
-    public function removeFromCart($itemId)
+    public function updateStockProduct(int $itemId, CartStockActions $mode): void
     {
         $cart = $this->getOrCreatePendingCart();
-        if ($cart) {
-            $item = $cart->cartItems()->find($itemId);
-            if ($item) {
-                $item->delete();
+
+        if (empty($cart)) return;
+
+        DB::transaction(function () use ($itemId, $mode, $cart) {
+            $cartItem = $cart->cartItems()->where('id', $itemId)->lockForUpdate()->first();
+
+            if (empty($cartItem)) return;
+
+            $product = Product::where('id', $cartItem->product_id)->lockForUpdate()->first();
+
+            if (empty($product)) return;
+
+            if (!empty($product->stock) && CartStockActions::INCREMENT === $mode) {
+                $product->decrement('stock');
+                $cartItem->increment('quantity');
+            } elseif (CartStockActions::DECREMENT === $mode) {
+                $product->increment('stock');
+                if ($cartItem->quantity > 1) {
+                    $cartItem->decrement('quantity');
+                } else {
+                    $cartItem->delete();
+                }
+            } elseif (CartStockActions::DELETE === $mode) {
+                $product->increment('stock', $cartItem->quantity);
+                $cartItem->delete();
             }
-        }
+
+        });
     }
 
     /**
@@ -117,7 +115,7 @@ class CartService
      *
      * @return array
      */
-    public function loadCart()
+    public function loadCart(): array
     {
         $cart = $this->getOrCreatePendingCart();
         if ($cart) {
