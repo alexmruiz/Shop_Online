@@ -49,7 +49,8 @@ class CartService
 
         DB::transaction(function () use ($productId, $cart) {
 
-            $product = Product::where('id', $productId)->lockForUpdate()->first();
+            $product = Product::lockForUpdate()->findOrFail($productId);
+
             $stock = !empty($product) ? $product->stock : 0;
 
             if (!empty($stock)) {
@@ -80,12 +81,16 @@ class CartService
     {
         $cart = $this->getOrCreatePendingCart();
 
+        if (empty($cart)) return;
+
         DB::transaction(function () use ($itemId, $mode, $cart) {
             $cartItem = $cart->cartItems()->where('id', $itemId)->lockForUpdate()->first();
 
+            if (empty($cartItem)) return;
+
             $product = Product::where('id', $cartItem->product_id)->lockForUpdate()->first();
 
-            if (empty($cartItem) || empty($product)) return;
+            if (empty($product)) return;
 
             if (!empty($product->stock) && CartStockActions::INCREMENT === $mode) {
                 $product->decrement('stock');
@@ -101,6 +106,7 @@ class CartService
                 $product->increment('stock', $cartItem->quantity);
                 $cartItem->delete();
             }
+
         });
     }
 

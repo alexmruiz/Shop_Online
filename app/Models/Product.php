@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Models\Scopes\ActiveForRegularUsersScope;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Casts\Attribute;
@@ -64,19 +65,8 @@ class Product extends Model
             ->get();
     }
 
-    /**
-     * Solo pueder ver los productos inactivos los usuarios con rol admin
-     *
-     * @return void
-     */
     protected static function booted(): void
-    {
-        static::addGlobalScope('activeForRegularUsers', function (Builder $builder) {
-            $user = Auth::user();
-
-            if (!$user || $user->role == 'user') {
-                $builder->where('is_active', true);
-            }
-        });
-    }
+{
+    static::addGlobalScope(new ActiveForRegularUsersScope());
+}
 }

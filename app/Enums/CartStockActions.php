@@ -4,7 +4,7 @@ namespace App\Enums;
 
 enum CartStockActions: string
 {
-    case INCREMENT = 'pending';
-    case DECREMENT = 'processing';
-    case DELETE = 'confirmed';
+    case INCREMENT = 'increment';
+    case DECREMENT = 'decrement';
+    case DELETE = 'delete';
 }
