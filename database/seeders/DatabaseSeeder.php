@@ -19,7 +19,7 @@ class DatabaseSeeder extends Seeder
     {
         // Crear usuarios
         User::factory(10)->create([
-            'password' => bcrypt('user_password'),
+            'password' => Hash::make('user_password'),
         ]);
 
         User::factory(1)->create([
@@ -54,6 +54,7 @@ class DatabaseSeeder extends Seeder
                             'cart_id' => $cart->id,
                             'product_id' => $product->id,
                             'unit_price' => $product->price, // Establecer el precio del producto
+                            'reserved_until' => fake()->dateTimeBetween('now', '+2 hours'),
                         ]);
                     }
                 });

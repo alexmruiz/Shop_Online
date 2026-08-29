@@ -21,8 +21,8 @@
                                 $product = \App\Models\Product::find($item['product_id']); 
                             @endphp
                             
-                            @if($product) 
-                                <x-image-product :product="$product" class="img-thumbnail me-3" /> 
+                            @if($product)
+                                <x-image-product :product="$product" class="img-thumbnail me-3" />
                             @endif
 
                             <!-- Información del producto -->

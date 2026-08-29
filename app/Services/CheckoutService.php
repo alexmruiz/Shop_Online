@@ -6,7 +6,9 @@ use App\Enums\CartStatus;
 use App\Jobs\Notification;
 use App\Models\User;
 use App\Models\Cart;
+use App\Models\Product;
 use Exception;
+use Illuminate\Support\Facades\DB;
 
 class CheckoutService
 {
@@ -80,13 +82,22 @@ class CheckoutService
     public function cartStateManager(Cart $cart, string $address, bool $isAcepted = false, bool $isCancelled = false): void
     {
         if (!empty($isAcepted)) {
-            $cart->update([
-                'status' => CartStatus::CONFIRMED,
-                'order_number' => $this->generateOrderNumber(),
-            ]);
-            Notification::dispatch($cart);
+            DB::transaction(function () use ($cart) {
+                $cart->update([
+                    'status' => CartStatus::CONFIRMED,
+                    'order_number' => $this->generateOrderNumber(),
+                ]);
+                $cartItems = $cart->cartItems;
+                foreach ($cartItems as $ct) {
+                    $productId = $ct->product_id;
+                    $product = Product::findOrFail($productId)->lockForUpdate();
+                    $product->decrement('stock', $ct->quantity);
+                }
+
+                Notification::dispatch($cart);
+            });
         } elseif (!empty($isCancelled)) {
-            $cart->update(['status' => 'pending']);
+            $cart->update(['status' => CartStatus::PENDING]);
         } else {
             // Solo guardar dirección, el estado se cambia en createCheckoutSession
             $cart->update(['address' => $address]);

@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Enums\CartStatus;
 use App\Enums\CartStockActions;
 use App\Models\Cart;
+use App\Models\CartItem;
 use App\Models\Product;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -51,22 +52,26 @@ class CartService
 
             $product = Product::lockForUpdate()->findOrFail($productId);
 
-            $stock = !empty($product) ? $product->stock : 0;
+            $reserved = CartItem::where('product_id', $productId)
+                ->where('reserved_until', '>', now())
+                ->sum('quantity');
 
-            if (!empty($stock)) {
+            $available = $product->stock - $reserved;
+
+            if ($available >= 1) {
 
                 $cartItem = $cart->cartItems()->where('product_id', $productId)->first();
                 if (!empty($cartItem)) {
                     $cartItem->increment('quantity');
+                    $cartItem->update(['reserved_until' => now()->addMinutes(30)]);
                 } else {
                     $cart->cartItems()->create([
                         'product_id' => $product->id,
                         'quantity' => 1,
                         'unit_price' => $product->price,
+                        'reserved_until' => now()->addMinutes(30)
                     ]);
                 }
-
-                $product->decrement('stock');
             }
         });
     }
@@ -90,23 +95,25 @@ class CartService
 
             $product = Product::where('id', $cartItem->product_id)->lockForUpdate()->first();
 
-            if (empty($product)) return;
+            $reserved = CartItem::where('product_id', $cartItem->product_id)
+                ->where('reserved_until', '>', now())
+                ->sum('quantity');
 
-            if (!empty($product->stock) && CartStockActions::INCREMENT === $mode) {
-                $product->decrement('stock');
+            $available = $product->stock - $reserved;
+
+            if (CartStockActions::INCREMENT === $mode && $available >= 1) {
                 $cartItem->increment('quantity');
+                $cartItem->update(['reserved_until' => now()->addMinutes(30)]);
             } elseif (CartStockActions::DECREMENT === $mode) {
-                $product->increment('stock');
                 if ($cartItem->quantity > 1) {
                     $cartItem->decrement('quantity');
+                    $cartItem->update(['reserved_until' => now()->addMinutes(30)]);
                 } else {
                     $cartItem->delete();
                 }
             } elseif (CartStockActions::DELETE === $mode) {
-                $product->increment('stock', $cartItem->quantity);
                 $cartItem->delete();
             }
-
         });
     }
 
