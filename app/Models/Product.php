@@ -22,7 +22,8 @@ class Product extends Model
         'image',
         'category_id',
         'external_id',
-        'stock'
+        'stock',
+        'reserved_stock'
     ];
 
     /**
