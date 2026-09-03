@@ -3,6 +3,7 @@
 namespace App\Console\Commands;
 
 use App\Models\CartItem;
+use App\Models\Product;
 use App\Notifications\CartItemExpiredNotification;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
@@ -37,7 +38,8 @@ class ReleaseExpiredCartReservations extends Command
                         $item->cart->user?->notify(
                             new CartItemExpiredNotification($item)
                         );
-
+                        $product = Product::findOrFail($item->product_id);
+                        $product->decrement('reserved_stock', $item->quantity);
                         $item->delete();
                     });
                 }

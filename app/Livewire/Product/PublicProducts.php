@@ -22,13 +22,12 @@ class PublicProducts extends Component
     protected $paginationTheme = 'bootstrap';
 
     // Propiedades de la clase
-    public $search = '';
-    public $cant = 15;
-    public $cartItems = [];
-    public $total = 0;
-    public $selectedCategory = null;
-    public $countItems = 0;
-    public $feedbackMessage = null;
+    public string $search = '';
+    public int $cant = 15;
+    public array $cartItems = [];
+    public int $total = 0;
+    public ?int $selectedCategory = null;
+    public int $countItems = 0;
 
     private ?CartService $cartService = null;
     private ?ProductService $productService = null;
@@ -68,10 +67,9 @@ class PublicProducts extends Component
      * @param mixed $productId
      * @return void
      */
-    public function addToCart($productId)
+    public function addToCart($productId): void
     {
         CartFacade::addToCart($productId); // Utiliza la fachada para agregar al carrito
-        //$this->feedbackMessage = 'Producto añadido al carrito correctamente.';
         $this->updateCart(); // Actualizar la vista del carrito
         $this->dispatch('product-add', id: $productId);
     }
@@ -100,6 +98,11 @@ class PublicProducts extends Component
             $this->selectedCategory,
             $this->cant
         );
+
+        foreach($products as &$product) {
+            $total = $product->stock - $product->reserved_stock;
+            $product['available_stock'] = $total;
+        }
 
         $cart = Auth::user() ? $this->cartService->getOrCreatePendingCart() : null;
 

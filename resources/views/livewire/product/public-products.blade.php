@@ -69,17 +69,17 @@
                                 <p class="card-text fw-bold text-primary fs-5">{{ number_format($product->price, 2) }} €</p>
 
                                 {{-- Indicadores de stock --}}
-                                @if ($product->stock > 0 && $product->stock <= 5)
+                                @if ($product['available_stock'] > 0 && $product['available_stock'] <= 5)
                                     <p class="card-text fw-bold text-danger small">
-                                        <i class="bi bi-exclamation-triangle-fill"></i> ¡Solo quedan {{ $product->stock }} uds!
+                                        <i class="bi bi-exclamation-triangle-fill"></i> ¡Solo quedan {{ $product['available_stock'] }} uds disponibles!
                                     </p>
                                 @endif
 
                                 <!-- Botón Añadir al Carrito -->
                                 <div class="mt-auto">
                                     @auth
-                                        @if ($product->stock > 0)
-                                            <button type="button" 
+                                        @if ($product['available_stock'] > 0)
+                                            <button type="button"
                                                     wire:click.prevent="addToCart({{ $product->id }})"
                                                     wire:loading.attr="disabled"
                                                     class="btn btn-primary w-100 mt-2">
