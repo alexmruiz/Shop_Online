@@ -3,7 +3,7 @@
 namespace App\Services;
 
 use App\Enums\CartStatus;
-use App\Jobs\Notification;
+use App\Jobs\OrderConfirmedNotification;
 use App\Models\User;
 use App\Models\Cart;
 use App\Models\Product;
@@ -94,7 +94,7 @@ class CheckoutService
                     $product->decrement('stock', $ct->quantity);
                 }
 
-                Notification::dispatch($cart);
+                OrderConfirmedNotification::dispatch($cart);
             });
         } elseif (!empty($isCancelled)) {
             $cart->update(['status' => CartStatus::PENDING]);
