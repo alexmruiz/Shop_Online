@@ -4,7 +4,6 @@ namespace App\Mail;
 
 use App\Models\Cart;
 use Illuminate\Bus\Queueable;
-use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Mail\Mailable;
 use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
@@ -14,7 +13,7 @@ class OrderConfirmedMail extends Mailable
 {
     use Queueable, SerializesModels;
 
-    public $cart;
+    public Cart $cart;
 
     /**
      * Create a new message instance.

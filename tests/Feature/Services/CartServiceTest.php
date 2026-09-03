@@ -48,7 +48,7 @@ class CartServiceTest extends TestCase
         $user = User::factory()->create();
         $this->actingAs($user);
 
-        $product = Product::factory()->create(['price' => 100, 'stock' => 20]);
+        $product = Product::factory()->create(['price' => 100, 'stock' => 20, 'reserved_stock' => 0]);
 
         $this->cartService->addToCart($product->id);
         $cart = $this->cartService->getOrCreatePendingCart();
@@ -65,6 +65,12 @@ class CartServiceTest extends TestCase
             'cart_id' => $cart->id,
             'product_id' => $product->id,
             'quantity' => 2,
+        ]);
+
+        // Verificar que el stock reservado aumentó
+        $this->assertDatabaseHas('products', [
+            'id' => $product->id,
+            'reserved_stock' => 2,
         ]);
     }
 
@@ -87,13 +93,14 @@ class CartServiceTest extends TestCase
     }
 
     #[Test]
-    public function it_decrements_cart_item_quantity_and_increments_product_stock(): void
+    public function it_decrements_cart_item_quantity_and_decrements_reserved_stock(): void
     {
         $user = User::factory()->create();
         $this->actingAs($user);
 
         $cart = Cart::factory()->create(['user_id' => $user->id, 'status' => CartStatus::PENDING]);
-        $product = Product::factory()->create(['stock' => 5]);
+        // Definimos stock = 5 y reserved_stock = 3 (sincronizado con las 3 unidades del CartItem)
+        $product = Product::factory()->create(['stock' => 5, 'reserved_stock' => 3]);
         $cartItem = CartItem::factory()->create([
             'cart_id' => $cart->id,
             'product_id' => $product->id,
@@ -102,9 +109,11 @@ class CartServiceTest extends TestCase
 
         $this->cartService->updateStockProduct($cartItem->id, CartStockActions::DECREMENT);
 
+        // El stock permanece intacto (5), pero el stock reservado baja a 2
         $this->assertDatabaseHas('products', [
             'id' => $product->id,
-            'stock' => 6,
+            'stock' => 5,
+            'reserved_stock' => 2,
         ]);
 
         $this->assertDatabaseHas('cart_items', [
@@ -120,7 +129,8 @@ class CartServiceTest extends TestCase
         $this->actingAs($user);
 
         $cart = Cart::factory()->create(['user_id' => $user->id, 'status' => CartStatus::PENDING]);
-        $product = Product::factory()->create(['stock' => 5]);
+        // Sincronizamos reserved_stock = 1
+        $product = Product::factory()->create(['stock' => 5, 'reserved_stock' => 1]);
         $cartItem = CartItem::factory()->create([
             'cart_id' => $cart->id,
             'product_id' => $product->id,
@@ -131,7 +141,8 @@ class CartServiceTest extends TestCase
 
         $this->assertDatabaseHas('products', [
             'id' => $product->id,
-            'stock' => 6,
+            'stock' => 5,
+            'reserved_stock' => 0,
         ]);
 
         $this->assertDatabaseMissing('cart_items', [
@@ -140,13 +151,14 @@ class CartServiceTest extends TestCase
     }
 
     #[Test]
-    public function it_deletes_cart_item_and_restores_full_stock(): void
+    public function it_deletes_cart_item_and_releases_reserved_stock(): void
     {
         $user = User::factory()->create();
         $this->actingAs($user);
 
         $cart = Cart::factory()->create(['user_id' => $user->id, 'status' => CartStatus::PENDING]);
-        $product = Product::factory()->create(['stock' => 10]);
+        // Sincronizamos reserved_stock = 4
+        $product = Product::factory()->create(['stock' => 10, 'reserved_stock' => 4]);
         $cartItem = CartItem::factory()->create([
             'cart_id' => $cart->id,
             'product_id' => $product->id,
@@ -157,7 +169,8 @@ class CartServiceTest extends TestCase
 
         $this->assertDatabaseHas('products', [
             'id' => $product->id,
-            'stock' => 14,
+            'stock' => 10,
+            'reserved_stock' => 0,
         ]);
 
         $this->assertDatabaseMissing('cart_items', [

@@ -3,10 +3,12 @@
 namespace App\Services;
 
 use App\Enums\CartStatus;
-use App\Jobs\Notification;
+use App\Jobs\OrderConfirmedNotification;
 use App\Models\User;
 use App\Models\Cart;
+use App\Models\Product;
 use Exception;
+use Illuminate\Support\Facades\DB;
 
 class CheckoutService
 {
@@ -80,13 +82,27 @@ class CheckoutService
     public function cartStateManager(Cart $cart, string $address, bool $isAcepted = false, bool $isCancelled = false): void
     {
         if (!empty($isAcepted)) {
-            $cart->update([
-                'status' => CartStatus::CONFIRMED,
-                'order_number' => $this->generateOrderNumber(),
-            ]);
-            Notification::dispatch($cart);
+            DB::transaction(function () use ($cart) {
+                $cart->update([
+                    'status' => CartStatus::CONFIRMED,
+                    'order_number' => $this->generateOrderNumber(),
+                ]);
+                $cartItems = $cart->cartItems;
+                foreach ($cartItems as $ct) {
+                    $productId = $ct->product_id;
+                    $product = Product::lockForUpdate()->findOrFail($productId);
+                    if ($product->reserved_stock < $ct->quantity) {
+                        throw new Exception('La reserva de stock no es válida.');
+                    }
+                    $product->decrement('stock', $ct->quantity);
+                    $product->decrement('reserved_stock', $ct->quantity);
+                    $ct->update(['reserved_until' => null]);
+                }
+
+                OrderConfirmedNotification::dispatch($cart);
+            });
         } elseif (!empty($isCancelled)) {
-            $cart->update(['status' => 'pending']);
+            $cart->update(['status' => CartStatus::PENDING]);
         } else {
             // Solo guardar dirección, el estado se cambia en createCheckoutSession
             $cart->update(['address' => $address]);
