@@ -2,6 +2,7 @@
 
 namespace App\Jobs;
 
+use App\Models\Cart;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Foundation\Queue\Queueable;
@@ -9,15 +10,15 @@ use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 
-class Notification implements ShouldQueue
+class OrderConfirmedNotification implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable;
 
-    public $cart;
+    public Cart $cart;
     /**
      * Create a new job instance.
      */
-    public function __construct($cart)
+    public function __construct(Cart $cart)
     {
         $this->cart = $cart;
     }
