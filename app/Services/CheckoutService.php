@@ -91,11 +91,12 @@ class CheckoutService
                 foreach ($cartItems as $ct) {
                     $productId = $ct->product_id;
                     $product = Product::lockForUpdate()->findOrFail($productId);
-                    if ($product->reserved_stock < $ct->quantity || $product->stock < $ct->quantit) {
+                    if ($product->reserved_stock < $ct->quantity) {
                         throw new Exception('La reserva de stock no es válida.');
                     }
                     $product->decrement('stock', $ct->quantity);
                     $product->decrement('reserved_stock', $ct->quantity);
+                    $ct->update(['reserved_until' => null]);
                 }
 
                 OrderConfirmedNotification::dispatch($cart);

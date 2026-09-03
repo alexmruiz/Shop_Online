@@ -111,35 +111,41 @@ class CheckoutServiceTest extends TestCase
         $this->service->process($user, $addressData);
     }
 
-    #[Test]
-    public function test_cart_state_manager_confirms_cart_and_dispatches_notification(): void
-    {
-        // 1. Arrange
-        Event::fake();
+   #[Test]
+public function test_cart_state_manager_confirms_cart_and_dispatches_notification(): void
+{
+    // 1. Arrange
+    Event::fake();
 
-        $cart = Cart::factory()->create(['status' => CartStatus::PROCESSING]);
+    $cart = Cart::factory()->create(['status' => CartStatus::PROCESSING]);
 
-        // Crear producto con stock inicial de 10
-        $product = Product::factory()->create(['stock' => 10]);
+    // Crear producto con stock inicial de 10 y reservado de 2
+    $product = Product::factory()->create([
+        'stock' => 10,
+        'reserved_stock' => 2
+    ]);
 
-        // Asociar el ítem al carrito con 2 unidades
-        CartItem::factory()->create([
-            'cart_id' => $cart->id,
-            'product_id' => $product->id,
-            'quantity' => 2,
-        ]);
+    // Asociar el ítem al carrito con 2 unidades
+    CartItem::factory()->create([
+        'cart_id' => $cart->id,
+        'product_id' => $product->id,
+        'quantity' => 2,
+    ]);
 
-        // 2. Act
-        $this->service->cartStateManager($cart, '', isAcepted: true);
+    // 2. Act
+    $this->service->cartStateManager($cart, '', isAcepted: true);
 
-        // 3. Assert
-        // Verificar actualización del carrito
-        $this->assertEquals(CartStatus::CONFIRMED, $cart->fresh()->status);
-        $this->assertNotNull($cart->fresh()->order_number);
+    // 3. Assert
+    $this->assertEquals(CartStatus::CONFIRMED, $cart->fresh()->status);
+    $this->assertNotNull($cart->fresh()->order_number);
 
-        // Verificar que el stock del producto se redujo de 10 a 8
-        $this->assertEquals(8, $product->fresh()->stock);
-    }
+    // Verificar que el stock real bajó a 8 y el reservado a 0
+    $this->assertDatabaseHas('products', [
+        'id' => $product->id,
+        'stock' => 8,
+        'reserved_stock' => 0,
+    ]);
+}
 
     /**
      * Test para validar que cartStateManager regresa el carrito a pending cuando es cancelado.

@@ -2,6 +2,7 @@
 
 namespace App\Console\Commands;
 
+use App\Enums\CartStatus;
 use App\Models\CartItem;
 use App\Models\Product;
 use App\Notifications\CartItemExpiredNotification;
@@ -31,6 +32,7 @@ class ReleaseExpiredCartReservations extends Command
     {
         CartItem::whereNotNull('reserved_until')
             ->where('reserved_until', '<=', now())
+            ->whereHas('cart', fn($q) => $q->where('status', CartStatus::PENDING))
             ->with(['cart.user', 'product'])
             ->chunkById(100, function ($items) {
                 foreach ($items as $item) {
@@ -38,7 +40,7 @@ class ReleaseExpiredCartReservations extends Command
                         $item->cart->user?->notify(
                             new CartItemExpiredNotification($item)
                         );
-                        $product = Product::findOrFail($item->product_id);
+                        $product = Product::lockForUpdate()->findOrFail($item->product_id);
                         $product->decrement('reserved_stock', $item->quantity);
                         $item->delete();
                     });
