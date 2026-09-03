@@ -54,7 +54,7 @@ class DatabaseSeeder extends Seeder
                             'cart_id' => $cart->id,
                             'product_id' => $product->id,
                             'unit_price' => $product->price, // Establecer el precio del producto
-                            'reserved_until' => fake()->dateTimeBetween('now', '+2 hours'),
+                            'reserved_until' => fake()->dateTimeBetween('now', '+1 hours'),
                         ]);
                     }
                 });
