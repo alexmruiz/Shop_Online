@@ -3,7 +3,7 @@
 namespace App\Services;
 
 use App\Enums\CartStatus;
-use App\Jobs\OrderConfirmedNotification;
+use App\Jobs\SendOrderConfirmationJob;
 use App\Models\User;
 use App\Models\Cart;
 use App\Models\Product;
@@ -87,19 +87,22 @@ class CheckoutService
                     'status' => CartStatus::CONFIRMED,
                     'order_number' => $this->generateOrderNumber(),
                 ]);
+
                 $cartItems = $cart->cartItems;
+
                 foreach ($cartItems as $ct) {
                     $productId = $ct->product_id;
                     $product = Product::lockForUpdate()->findOrFail($productId);
-                    if ($product->reserved_stock < $ct->quantity) {
+
+                    if ($product->reserved_stock >= $ct->quantity) {
                         throw new Exception('La reserva de stock no es válida.');
                     }
-                    $product->decrement('stock', $ct->quantity);
-                    $product->decrement('reserved_stock', $ct->quantity);
+
+                    $product->update(['stock' => $ct->quantity, 'reserved_stock' => $ct->quantity]);
                     $ct->update(['reserved_until' => null]);
                 }
 
-                OrderConfirmedNotification::dispatch($cart);
+                SendOrderConfirmationJob::dispatch($cart);
             });
         } elseif (!empty($isCancelled)) {
             $cart->update(['status' => CartStatus::PENDING]);
