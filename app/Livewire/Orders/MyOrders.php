@@ -41,9 +41,9 @@ class MyOrders extends Component
         $this->resetPage();
     }
 
-    public function downloadInvoice($id)
+    public function downloadInvoice(int $cartId)
     {
-        return InvoiceFacade::downloadInvoice($id);
+        return InvoiceFacade::downloadInvoiceByCartId($cartId);
     }
 
     public function render()

@@ -3,12 +3,15 @@
 namespace App\Services;
 
 use App\Enums\CartStatus;
-use App\Jobs\OrderConfirmedNotification;
+use App\Exceptions\CheckoutService\CartNotFoundException;
+use App\Exceptions\CheckoutService\StockReservationException;
+use App\Jobs\GenerateInvoiceJob;
+use App\Jobs\SendOrderConfirmationJob;
 use App\Models\User;
 use App\Models\Cart;
 use App\Models\Product;
-use Exception;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class CheckoutService
 {
@@ -39,6 +42,7 @@ class CheckoutService
 
             return $this->createCheckoutSession($user, $cart, $amount);
         } catch (\Throwable $th) {
+            Log::error("Error en: " . __METHOD__ . ' ' . $th->getMessage());
             throw $th;
         }
     }
@@ -54,7 +58,7 @@ class CheckoutService
         $cart = $user->carts()->where('status', CartStatus::PENDING)->first();
 
         if (!$cart) {
-            throw new Exception('No se encontró un carrito asociado al usuario.');
+            throw new CartNotFoundException('No se encontró un carrito asociado al usuario.');
         }
 
         return $cart;
@@ -87,19 +91,25 @@ class CheckoutService
                     'status' => CartStatus::CONFIRMED,
                     'order_number' => $this->generateOrderNumber(),
                 ]);
+
                 $cartItems = $cart->cartItems;
+
                 foreach ($cartItems as $ct) {
                     $productId = $ct->product_id;
                     $product = Product::lockForUpdate()->findOrFail($productId);
-                    if ($product->reserved_stock < $ct->quantity) {
-                        throw new Exception('La reserva de stock no es válida.');
+
+                    if ($product->stock < $ct->quantity) {
+                        throw new StockReservationException('La reserva de stock no es válida.');
                     }
+
+                    // Decrementar stock
                     $product->decrement('stock', $ct->quantity);
                     $product->decrement('reserved_stock', $ct->quantity);
+
                     $ct->update(['reserved_until' => null]);
                 }
-
-                OrderConfirmedNotification::dispatch($cart);
+                GenerateInvoiceJob::dispatch($cart);
+                SendOrderConfirmationJob::dispatch($cart);
             });
         } elseif (!empty($isCancelled)) {
             $cart->update(['status' => CartStatus::PENDING]);
