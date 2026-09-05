@@ -2,11 +2,9 @@
 
 namespace App\Services;
 
-use App\Enums\CartStatus;
 use App\Models\Cart;
 use Dompdf\Dompdf;
 use Dompdf\Options;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Gate;
 
@@ -14,27 +12,28 @@ class InvoiceService
 {
     /**
      * Genera la última factura confirmada del usuario autenticado.
+     *
+     * @param Cart $cart
+     * @return Response
      */
-    public function generateInvoice()
+    public function generateInvoice(Cart $cart): Response
     {
-        $cart = $this->getLatestConfirmedCart(Auth::user()->id);
-
-        if (!$cart) {
-            return redirect()->route('home')
-                ->with('error', 'No se encontró un pedido confirmado.');
-        }
+        // Cargar relaciones si no están presentes
+        $cart->loadMissing(['cartItems.product', 'user']);
 
         return $this->buildPdfResponse($cart, 'attachment');
     }
 
     /**
      * Descarga una factura por ID (inline en navegador).
+     *
+     * @param integer $id
+     * @return Response
      */
-    public function downloadInvoice(int $id)
+    public function downloadInvoice(int $id): Response
     {
         $cart = Cart::with('cartItems.product', 'user')->findOrFail($id);
 
-        //Autorización
         Gate::authorize('view', $cart);
 
         return $this->buildPdfResponse($cart, 'inline');
@@ -43,20 +42,6 @@ class InvoiceService
     /* ===============================
        Métodos privados de soporte
        =============================== */
-
-    /**
-     * Obtiene el último carrito confirmado de un usuario.
-     * @param int $userId
-     * @return Cart|null
-     */
-    private function getLatestConfirmedCart(int $userId): ?Cart
-    {
-        return Cart::with('cartItems.product', 'user')
-            ->where('user_id', $userId)
-            ->where('status', CartStatus::CONFIRMED)
-            ->latest()
-            ->first();
-    }
 
     /**
      * Sanitiza los datos del carrito para evitar problemas de codificación.

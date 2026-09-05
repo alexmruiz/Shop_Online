@@ -45,7 +45,7 @@ class CartConfirmed extends Component
      */
     public function generateInvoice()
     {
-        return InvoiceFacade::generateInvoice();
+        return InvoiceFacade::generateInvoice($this->cart);
     }
 
     #[Layout('components.layouts.app_public')]
