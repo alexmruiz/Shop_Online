@@ -30,7 +30,7 @@ class InvoiceService
      * @param integer $id
      * @return Response
      */
-    public function downloadInvoice(int $id): Response
+    public function downloadInvoiceByCartId(int $id): Response
     {
         $cart = Cart::with('cartItems.product', 'user')->findOrFail($id);
 
