@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Enums\CartStatus;
+use App\Exceptions\StockReservationException;
 use App\Jobs\GenerateInvoiceJob;
 use App\Jobs\SendOrderConfirmationJob;
 use App\Models\User;
@@ -95,8 +96,8 @@ class CheckoutService
                     $productId = $ct->product_id;
                     $product = Product::lockForUpdate()->findOrFail($productId);
 
-                    if ($product->reserved_stock >= $ct->quantity) {
-                        throw new Exception('La reserva de stock no es válida.');
+                    if ($product->stock >= $product->reserved_stock && !empty($ct->quantity)) {
+                        throw new StockReservationException('La reserva de stock no es válida.');
                     }
 
                     $product->update(['stock' => $ct->quantity, 'reserved_stock' => $ct->quantity]);
