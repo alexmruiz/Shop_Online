@@ -13,7 +13,7 @@ class ProductShow extends Component
     public Product $product;
     
     public function render()
-    {      
+    {
         return view('livewire.product.product-show');
     }
 }

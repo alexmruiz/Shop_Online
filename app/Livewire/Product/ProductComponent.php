@@ -8,7 +8,6 @@ use Livewire\Attributes\Title;
 use Livewire\Attributes\Computed;
 use Livewire\WithPagination;
 use App\Models\Category;
-use App\Services\ProductService;
 use Livewire\Attributes\On;
 use Livewire\WithFileUploads;
 
@@ -22,15 +21,16 @@ class ProductComponent extends Component
     // Propiedades de la clase
     public int $totalRegistros = 0;
     public string $search = '';
-    public int $cant = 5;
+    public int $cant = 10;
 
     // Propiedades del modelo
     public string $name;
-    public $Id = 0;
-    public int $category_id;
-    public $description;
-    public $price;
-    public $is_active = 1;
+    public int $productId = 0;
+    public int $categoryId;
+    public string $description;
+    public float $price;
+    public int $stock;
+    public int $isActive = 1;
     public $image;
 
     // Renderiza la vista del componente
@@ -56,7 +56,7 @@ class ProductComponent extends Component
     // Abre el modal para crear un nuevo producto
     public function create()
     {
-        $this->Id = 0;
+        $this->productId = 0;
         $this->clean();
         $this->dispatch('open-modal', 'modalProduct');
     }
@@ -67,25 +67,13 @@ class ProductComponent extends Component
         $rules = [
             'name' => 'required|min:5|max:255|unique:products',
             'description' => 'max:255',
+            'stock' => 'required|integer',
             'price' => 'required|numeric',
             'category_id' => 'required|numeric',
             'image' => 'image|max:1024|nullable',
         ];
 
-        $messages = [
-            'name.required' => 'El nombre es requerido',
-            'name.min' => 'El nombre debe tener al menos 5 caracteres.',
-            'name.max' => 'El nombre no puede exceder los 255 caracteres.',
-            'name.unique' => 'El nombre ya está registrado en las categorías.',
-            'description.max' => 'La descripción no puede exceder los 255 caracteres.',
-            'price.numeric' => 'El precio debe ser un número.',
-            'category_id.required' => 'La categoría es obligatoria.',
-            'category_id.numeric' => 'La categoría debe ser un número válido.',
-            'image.image' => 'El archivo debe ser una imagen.',
-            'image.max' => 'La imagen no puede exceder los 1024KB.',
-        ];
-
-        $this->validate($rules, $messages);
+        $this->validate($rules);
 
         $product = new Product();
 
@@ -98,8 +86,9 @@ class ProductComponent extends Component
         $product->name = $this->name;
         $product->description = $this->description;
         $product->price = $this->price;
-        $product->category_id = $this->category_id;
-        $product->is_active = $this->is_active;
+        $product->stock = $this->stock;
+        $product->category_id = $this->categoryId;
+        $product->is_active = $this->isActive;
         $product->save();
 
         $this->dispatch('close-modal', 'modalProduct');
@@ -111,12 +100,13 @@ class ProductComponent extends Component
     public function edit(Product $product)
     {
         $this->clean();
-        $this->Id = $product->id;
+        $this->productId = $product->id;
         $this->name = $product->name;
         $this->description = $product->description;
         $this->price = $product->price;
-        $this->is_active = $product->is_active;
-        $this->category_id = $product->category_id;
+        $this->stock = $product->stock;
+        $this->isActive = $product->is_active;
+        $this->categoryId = $product->category_id;
         $this->image = $product->image;
 
         $this->dispatch('open-modal', 'modalProduct');
@@ -131,22 +121,10 @@ class ProductComponent extends Component
             'price' => 'required|numeric',
             'category_id' => 'required|numeric',
             'image' => 'image|max:1024|nullable',
+            'stock' => 'required|integer'
         ];
 
-        $messages = [
-            'name.required' => 'El nombre es requerido',
-            'name.min' => 'El nombre debe tener al menos 5 caracteres.',
-            'name.max' => 'El nombre no puede exceder los 255 caracteres.',
-            'name.unique' => 'El nombre ya está registrado en las categorías.',
-            'description.max' => 'La descripción no puede exceder los 255 caracteres.',
-            'price.numeric' => 'El precio debe ser un número.',
-            'category_id.required' => 'La categoría es obligatoria.',
-            'category_id.numeric' => 'La categoría debe ser un número válido.',
-            'image.image' => 'El archivo debe ser una imagen.',
-            'image.max' => 'La imagen no puede exceder los 1024KB.',
-        ];
-
-        $this->validate($rules, $messages);
+        $this->validate($rules);
 
         if ($this->image) {
             $customName = uniqid() . '.' . $this->image->extension();
@@ -158,8 +136,9 @@ class ProductComponent extends Component
             'name' => $this->name,
             'description' => $this->description,
             'price' => $this->price,
-            'category_id' => $this->category_id,
-            'is_active' => $this->is_active,
+            'category_id' => $this->categoryId,
+            'is_active' => $this->isActive,
+            'stock' => $this->stock,
             'image' => $product->image,
         ]);
 
@@ -171,13 +150,13 @@ class ProductComponent extends Component
     // Método encargado de la limpieza del modal
     public function clean()
     {
-        $this->reset(['Id', 'name', 'description', 'price', 'is_active', 'category_id']);
+        $this->reset(['productId', 'name', 'description', 'price', 'isActive', 'categoryId', 'stock']);
         $this->resetErrorBag();
     }
 
     //Elimina el producto
     #[On('destroyProduct')]
-    public function destroy($id)
+    public function destroy(int $id): void
     {
         $product = Product::findOrFail($id);
         $product->delete();
