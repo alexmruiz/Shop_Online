@@ -3,17 +3,17 @@
         <x-slot:cardTools>
             <a href="#" class="btn btn-primary" wire:click='create'>
                 <i class="fas fa-plus-circle"></i>
-                Crear categoria              
+                Crear categoria
             </a>
         </x-slot:cardTools>
        
         <x-table>
-            <x-slot:thead> 
+            <x-slot:thead>
                 <th>Id</th>
                 <th>Nombre</th>
-                <th width="3%">...</th>
-                <th width="3%">...</th>
-                <th width="3%">...</th>
+                <th>...</th>
+                <th>...</th>
+                <th>...</th>
             </x-slot>
 
             @forelse ($categories as $category)
@@ -54,7 +54,7 @@
     </x-card>
 
     <x-modal modalId="modalCategory" modalTitle="Categorías">
-        <form wire:submit.prevent="{{$Id==0 ? "store" : "update($Id)"}} ">
+        <form wire:submit.prevent="{{$categoryId == 0 ? "store" : "update($categoryId)"}} ">
             <div class="form-row">
                 <div class="form-group col-12">
                     <label for="name">Nombre:</label>
@@ -63,9 +63,16 @@
                         <div class="alert alert-danger w-100 mt-2">{{$message}}</div>
                     @enderror
                 </div>
+                <div class="form-group col-12">
+                    <label for="description">Descripción:</label>
+                    <input wire:model='description' type="text" class="form-control" id="description" placeholder="Descripción de la categoria">
+                    @error('description')
+                        <div class="alert alert-danger w-100 mt-2">{{$message}}</div>
+                    @enderror
+                </div>
             </div>
             <hr>
-            <button class="btn btn-primary float-right">{{$Id==0 ? 'Guardar' : 'Editar'}}</button>
+            <button class="btn btn-primary float-right">{{$categoryId == 0 ? 'Guardar' : 'Editar'}}</button>
         </form>
     </x-modal>
 </div>

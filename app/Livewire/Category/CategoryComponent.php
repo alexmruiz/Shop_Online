@@ -28,6 +28,7 @@ class CategoryComponent extends Component
 
     //Propiedades modelo
     public string $name = '';
+    public ?string $description = null;
     public int $categoryId;
 
     public function render()
@@ -69,6 +70,7 @@ class CategoryComponent extends Component
 
         $category = new Category();
         $category->name = $this->name;
+        $category->description = $this->description;
         $category->save();
 
         $this->dispatch('close-modal', 'modalCategory');
@@ -79,23 +81,24 @@ class CategoryComponent extends Component
 
     /**
      * Abre el modal para editar una categoría existente.
-     * 
      * @param Category $category Instancia del modelo de categoría a editar
      */
     public function edit(Category $category)
     {
 
         $this->reset(['name']);
+
         $this->categoryId = $category->id;
 
         $this->name = $category->name;
+
+        $this->description = $category->description  ?? '';
 
         $this->dispatch('open-modal', 'modalCategory');
     }
 
     /**
      * Actualiza los datos de una categoría existente.
-     * 
      * @param Category $category Instancia del modelo a actualizar
      */
     public function update(Category $category)
@@ -108,17 +111,17 @@ class CategoryComponent extends Component
         $this->validate($rules);
 
         $category->name = $this->name;
+        $category->description = $this->description;
         $category->update();
 
         $this->dispatch('close-modal', 'modalCategory');
         $this->dispatch('msg', 'Categoria editada correctamente');
 
-        $this->reset(['name']);
+        $this->reset(['name', 'description']);
     }
 
     /**
      * Elimina una categoría de la base de datos.
-     * 
      * @param int $id ID de la categoría a eliminar
      */
     #[On('destroyCategory')]
