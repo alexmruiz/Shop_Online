@@ -38,6 +38,9 @@ class CheckoutService
 
             $this->cartStateManager($cart, $address);
 
+            // Cambiar estado a "processing"
+            $cart->update(['status' => CartStatus::PROCESSING]);
+
             $amount = $this->calculateTotal($cart);
 
             return $this->createCheckoutSession($user, $cart, $amount);
@@ -108,8 +111,8 @@ class CheckoutService
 
                     $ct->update(['reserved_until' => null]);
                 }
-                GenerateInvoiceJob::dispatch($cart);
-                SendOrderConfirmationJob::dispatch($cart);
+                GenerateInvoiceJob::dispatch($cart)->afterCommit();
+                SendOrderConfirmationJob::dispatch($cart)->afterCommit();
             });
         } elseif (!empty($isCancelled)) {
             $cart->update(['status' => CartStatus::PENDING]);
@@ -126,7 +129,9 @@ class CheckoutService
      */
     private function calculateTotal(Cart $cart): int
     {
-        return $cart->cartItems->sum(fn($item) => $item->unit_price * $item->quantity);
+        return (int) round(
+            $cart->cartItems->sum(fn($item) => $item->unit_price * $item->quantity) * 100
+        );
     }
 
     /**
@@ -138,8 +143,6 @@ class CheckoutService
      */
     private function createCheckoutSession(User $user, Cart $cart, int $amount)
     {
-        // Cambiar estado a "processing" ANTES de crear la sesión
-        $cart->update(['status' => CartStatus::PROCESSING]);
 
         return $user->checkout([[
             'price_data' => [
