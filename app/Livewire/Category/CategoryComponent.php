@@ -28,7 +28,7 @@ class CategoryComponent extends Component
 
     //Propiedades modelo
     public string $name = '';
-    public string $description = '';
+    public ?string $description = null;
     public int $categoryId;
 
     public function render()
@@ -92,7 +92,7 @@ class CategoryComponent extends Component
 
         $this->name = $category->name;
 
-        $this->description = $category->description;
+        $this->description = $category->description  ?? '';
 
         $this->dispatch('open-modal', 'modalCategory');
     }
@@ -117,7 +117,7 @@ class CategoryComponent extends Component
         $this->dispatch('close-modal', 'modalCategory');
         $this->dispatch('msg', 'Categoria editada correctamente');
 
-        $this->reset(['name']);
+        $this->reset(['name', 'description']);
     }
 
     /**
