@@ -11,10 +11,9 @@ use Livewire\Attributes\Computed;
 use Livewire\Component;
 use Livewire\Attributes\Title;
 
-#[Title('Inicio')]
-class Inicio extends Component
+#[Title('Dashboard')]
+class DashboardComponent extends Component
 {
-    public int $Id = 0;
     public int $totalRegistrosClient = 0;
     public int $totalRegistrosProduct = 0;
     public int $categoryId;
@@ -44,7 +43,7 @@ class Inicio extends Component
         $this->totalRegistrosClient = User::where('role', 'user')->count();
 
 
-        return view('livewire.home.inicio', data: [
+        return view('livewire.home.dashboard-component', data: [
 
 
             'topSellingProducts' => $this->topSellingProducts,
