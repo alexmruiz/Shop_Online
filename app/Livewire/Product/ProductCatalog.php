@@ -17,7 +17,7 @@ use Livewire\Component;
 use Livewire\WithPagination;
 
 #[Title('Home')]
-class PublicProducts extends Component
+class ProductCatalog extends Component
 {
     use WithPagination;
     protected $paginationTheme = 'bootstrap';
@@ -114,7 +114,7 @@ class PublicProducts extends Component
             $this->total = $cart->cartItems()->sum('quantity');
         }
 
-        return view('livewire.product.public-products', [
+        return view('livewire.product.product-catalog', [
             'products' => $products,
             'categories' => $repository->getAllCategories(),
         ]);

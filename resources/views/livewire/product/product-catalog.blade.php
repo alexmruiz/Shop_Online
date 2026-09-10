@@ -1,5 +1,11 @@
 <div class="mt-4 mb-4">
     <x-card-public cardTitle="{{ __('home.explore_products') }}">
+        @auth
+            <div class="alert alert-info" role="alert">
+                <i class="bi bi-clock me-1"></i> {{ __('cart.expiration_notice') }}
+            </div>
+        @endauth
+
         <!-- Barra de herramientas -->
         <div class="d-flex flex-wrap justify-content-between align-items-center mb-4 gap-2">
             <!-- Buscador -->
