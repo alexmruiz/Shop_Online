@@ -9,6 +9,7 @@ use App\Repositories\ProductRepository;
 use App\Services\CartService;
 use App\Services\ProductService;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Cache;
 use Livewire\Attributes\Computed;
 use Livewire\Attributes\Layout;
 use Livewire\Attributes\Title;
@@ -36,7 +37,9 @@ class PublicProducts extends Component
     #[Computed()] // Obtiene todas las categorías
     public function categories()
     {
-        return Category::all();
+        return Cache::rememberForever('categories', function () {
+            return Category::all();
+        });
     }
 
     public function mount(ProductService $productService, CartService $cartService)

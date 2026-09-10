@@ -6,6 +6,7 @@ use Livewire\Component;
 use Livewire\Attributes\Title;
 use Livewire\WithPagination;
 use App\Models\Category;
+use Illuminate\Support\Facades\Cache;
 use Livewire\Attributes\On;
 
 /**
@@ -20,23 +21,20 @@ class CategoryComponent extends Component
     use WithPagination;
     protected $paginationTheme = 'bootstrap';
     //Propiedades de la clase
-    public $totalRegistros = 0;
-    public $search = '';
-    public $cant = 5;
+    public int $totalRegistros = 0;
+    public string $search = '';
+    public int $cant = 5;
     //Propiedades modelo
-    public $name = '';
+    public string $name = '';
     public int $categoryId;
 
     public function render()
     {
-
-        //$this->dispatch('open-modal', 'modalProduct');
         // Filtra las categorías por el nombre y realiza la paginación
         $this->totalRegistros = Category::count();
         $categories = Category::where('name', 'like', '%' . $this->search . '%')
             ->orderBy('id', 'desc')
             ->paginate($this->cant);
-
 
         return view('livewire.category.category-component', [
             'categories' => $categories
@@ -63,18 +61,14 @@ class CategoryComponent extends Component
         $rules = [
             'name' => 'required|min:5|max:255|unique:categories'
         ];
-        $messages = [
-            'name.required' => 'El nombre es requerido',
-            'name.min' => 'Mínimo 5 caracteres',
-            'name.max' => 'Maximo 255 caracteres',
-            'name.unique' => 'Esta categoría ya esta creada'
-        ];
 
-        $this->validate($rules, $messages);
+        $this->validate($rules);
 
         $category = new Category();
         $category->name = $this->name;
         $category->save();
+                $this->updateCategoriesByCache();
+
 
         $this->dispatch('close-modal', 'modalCategory');
         $this->dispatch('msg', 'Categoria creada correctamente');
@@ -109,20 +103,16 @@ class CategoryComponent extends Component
         $rules = [
             'name' => 'required|min:5|max:255|unique:categories,id,' . $this->categoryId
         ];
-        $messages = [
-            'name.required' => 'El nombre es requerido',
-            'name.min' => 'Mínimo 5 caracteres',
-            'name.max' => 'Maximo 255 caracteres',
-            'name.unique' => 'Esta categoría ya esta creada'
-        ];
 
-        $this->validate($rules, $messages);
+        $this->validate($rules);
 
         $category->name = $this->name;
         $category->update();
 
         $this->dispatch('close-modal', 'modalCategory');
         $this->dispatch('msg', 'Categoria editada correctamente');
+                $this->updateCategoriesByCache();
+
 
         $this->reset(['name']);
     }
@@ -137,7 +127,15 @@ class CategoryComponent extends Component
     {
         $category = Category::findOrFail($id);
         $category->delete();
+        $this->updateCategoriesByCache();
 
         $this->dispatch('msg', 'La categoria ha sido eliminada correctamente');
+    }
+
+    public function updateCategoriesByCache()
+    {
+        Cache::forget('categories');
+        $categories = Category::all();
+        Cache::forever('categories', $categories);
     }
 }
