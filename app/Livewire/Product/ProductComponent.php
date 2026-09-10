@@ -28,7 +28,7 @@ class ProductComponent extends Component
     public int $productId = 0;
     public int $categoryId;
     public string $description;
-    public int $price;
+    public float $price;
     public int $stock;
     public int $isActive = 1;
     public $image;
@@ -150,7 +150,7 @@ class ProductComponent extends Component
     // Método encargado de la limpieza del modal
     public function clean()
     {
-        $this->reset(['productId', 'name', 'description', 'price', 'is_active', 'category_id', 'stock']);
+        $this->reset(['productId', 'name', 'description', 'price', 'isActive', 'categoryId', 'stock']);
         $this->resetErrorBag();
     }
 

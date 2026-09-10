@@ -32,7 +32,7 @@
 
                         <td>{{ $product->stock ?? 0 }}</td>
 
-                        <td>{{ $product->stock_reserved ?? 0 }}</td>
+                        <td>{{ $product->reserved_stock ?? 0 }}</td>
 
                         <td>
                             <a class="badge badge-secondary" href="{{route('categoryShow', $product->category->id)}}"> {{ $product->category->name }}
