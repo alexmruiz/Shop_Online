@@ -6,7 +6,6 @@ use Livewire\Component;
 use Livewire\Attributes\Title;
 use Livewire\WithPagination;
 use App\Models\Category;
-use Illuminate\Support\Facades\Cache;
 use Livewire\Attributes\On;
 
 /**
@@ -19,19 +18,25 @@ use Livewire\Attributes\On;
 class CategoryComponent extends Component
 {
     use WithPagination;
+
     protected $paginationTheme = 'bootstrap';
+
     //Propiedades de la clase
     public int $totalRegistros = 0;
     public string $search = '';
     public int $cant = 5;
+
     //Propiedades modelo
     public string $name = '';
     public int $categoryId;
+
+    public const CACHE_KEY = 'categories';
 
     public function render()
     {
         // Filtra las categorías por el nombre y realiza la paginación
         $this->totalRegistros = Category::count();
+
         $categories = Category::where('name', 'like', '%' . $this->search . '%')
             ->orderBy('id', 'desc')
             ->paginate($this->cant);
@@ -67,8 +72,6 @@ class CategoryComponent extends Component
         $category = new Category();
         $category->name = $this->name;
         $category->save();
-                $this->updateCategoriesByCache();
-
 
         $this->dispatch('close-modal', 'modalCategory');
         $this->dispatch('msg', 'Categoria creada correctamente');
@@ -111,8 +114,6 @@ class CategoryComponent extends Component
 
         $this->dispatch('close-modal', 'modalCategory');
         $this->dispatch('msg', 'Categoria editada correctamente');
-                $this->updateCategoriesByCache();
-
 
         $this->reset(['name']);
     }
@@ -132,10 +133,4 @@ class CategoryComponent extends Component
         $this->dispatch('msg', 'La categoria ha sido eliminada correctamente');
     }
 
-    public function updateCategoriesByCache()
-    {
-        Cache::forget('categories');
-        $categories = Category::all();
-        Cache::forever('categories', $categories);
-    }
 }
