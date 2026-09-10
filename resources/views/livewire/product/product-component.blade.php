@@ -3,20 +3,22 @@
         <x-slot:cardTools>
             <a href="#" class="btn btn-primary" wire:click='create'>
                 <i class="fas fa-plus-circle"></i>
-                Crear producto              
+                Crear producto
             </a>
         </x-slot>
        
         <x-table>
-            <x-slot:thead> 
+            <x-slot:thead>
                 <th>Id</th>
                 <th>Nombre</th>
                 <th>Precio</th>
+                <th>Stock</th>
+                <th>Stock reservado</th>
                 <th>Categoria</th>
                 <th>Estado</th>
-                <th width="3%">...</th>
-                <th width="3%">...</th>
-                <th width="3%">...</th>
+                <th>...</th>
+                <th>...</th>
+                <th>...</th>
             </x-slot>
 
             @forelse ($products as $product)
@@ -28,10 +30,14 @@
 
                         <td>{{ number_format($product->price, 2, ',', '.') }}€</td>
 
+                        <td>{{ $product->stock ?? 0 }}</td>
+
+                        <td>{{ $product->stock_reserved ?? 0 }}</td>
+
                         <td>
                             <a class="badge badge-secondary" href="{{route('categoryShow', $product->category->id)}}"> {{ $product->category->name }}
                         </td>
-                        <td>{!! $product->activeLabel !!}</td>                          
+                        <td>{!! $product->activeLabel !!}</td>
                         <td>
                             <a href="{{route('productShow',$product)}}" class="btn btn-success bt-sm" title="Ver">
                                 <i class="far fa-eye"></i>

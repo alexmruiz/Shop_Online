@@ -1,5 +1,5 @@
 <x-modal modalId="modalProduct" modalTitle="Productos" modalSize="modal-lg">
-    <form wire:submit.prevent="{{$Id==0 ? "store" : "update($Id)"}} ">
+    <form wire:submit.prevent="{{$productId==0 ? "store" : "update($productId)"}} ">
         <div class="form-row">
             {{--Input Name--}}
             <div class="form-group col-md-6">
@@ -16,15 +16,15 @@
                     <option value="0">Seleccionar </option>
                     @foreach ($this->categories as $category)
                     <option value="{{$category->id}}">{{$category->name}}</option>
-                    @endforeach                   
+                    @endforeach
                 </select>
                 @error('category_id')
                     <div class="alert alert-danger w-100 mt-2">{{$message}}</div>
                 @enderror
-            </div>  
+            </div>
             {{--Textarea Descripción--}}
             <div class="form-group col-md-12">
-                <label for="category_id">Descripción:</label>
+                <label for="description">Descripción:</label>
 
                 <textarea wire:model='description' id="description" class="form-control" cols="30" rows="3">
                 </textarea>
@@ -37,12 +37,12 @@
             {{--Input precio--}}
             <div class="form-group col-md-6">
                 <label for="price">Precio:</label>
-                <input wire:model='price' min="0" type="number" step="any" class="form-control" id="price" 
+                <input wire:model='price' min="0" type="number" step="any" class="form-control" id="price"
                 placeholder="Precio">
                 @error('price')
                     <div class="alert alert-danger w-100 mt-2">{{$message}}</div>
                 @enderror
-            </div>         
+            </div>
              {{--Input imagen--}}
              <div class="form-group col-md-6">
 
@@ -52,7 +52,7 @@
                 @error('image')
                     <div class="alert alert-danger w-100 mt-2">{{$message}}</div>
                 @enderror
-            </div> 
+            </div>
             {{--Checkbox is_active--}}
             <div class="form-group col-md-3">
                 <div class="icheck-primary">
@@ -62,7 +62,7 @@
                 @error('is_active')
                     <div class="alert alert-danger w-100 mt-2">{{$message}}</div>
                 @enderror
-            </div> 
+            </div>
 
             {{--Imagen
             <div class="form-group col-md-6">
@@ -71,11 +71,11 @@
                 @endif
 
                 @if ($this->image)
-                       <img src="{{$image->temporaryURL()}}" width="200" alt="" class="rounded float right">    
-                @endif 
+                       <img src="{{$image->temporaryURL()}}" width="200" alt="" class="rounded float right">
+                @endif
             </div> --}}
         </div>
         <hr>
-        <button wire:loading.attr='disabled' class="btn btn-primary float-right">{{$Id==0 ? 'Guardar' : 'Editar'}}</button>
+        <button wire:loading.attr='disabled' class="btn btn-primary float-right">{{$productId == 0 ? 'Guardar' : 'Editar'}}</button>
     </form>
 </x-modal>
