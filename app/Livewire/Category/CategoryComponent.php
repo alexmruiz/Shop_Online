@@ -30,8 +30,6 @@ class CategoryComponent extends Component
     public string $name = '';
     public int $categoryId;
 
-    public const CACHE_KEY = 'categories';
-
     public function render()
     {
         // Filtra las categorías por el nombre y realiza la paginación
@@ -128,7 +126,6 @@ class CategoryComponent extends Component
     {
         $category = Category::findOrFail($id);
         $category->delete();
-        $this->updateCategoriesByCache();
 
         $this->dispatch('msg', 'La categoria ha sido eliminada correctamente');
     }

@@ -36,7 +36,7 @@ class CategoryObserver
      */
     public function restored(Category $category): void
     {
-        //
+        Cache::forget('categories');
     }
 
     /**
