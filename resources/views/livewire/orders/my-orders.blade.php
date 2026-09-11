@@ -29,7 +29,7 @@
                     <p>
                         <span class="text-secondary">{{ __('orders.status') }}:</span> 
                         <strong class="badge {{ $cart->status === 'completed' ? 'bg-success' : 'bg-warning' }}">
-                            {{ ucfirst($cart->status) }}
+                            {{ ($cart->status) }}
                         </strong>
                     </p>
                     <p>
