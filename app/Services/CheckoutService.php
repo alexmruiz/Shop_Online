@@ -45,7 +45,11 @@ class CheckoutService
 
             return $this->createCheckoutSession($user, $cart, $amount);
         } catch (\Throwable $th) {
-            Log::error("Error en: " . __METHOD__ . ' ' . $th->getMessage());
+            Log::error("Error en: " . __METHOD__ , [
+                'user_id' => $user->id ?? null,
+                'cart_id' => $cart->id ?? null,
+                'exception' => $th->getMessage(),
+            ]);
             throw $th;
         }
     }
@@ -95,6 +99,11 @@ class CheckoutService
                     'order_number' => $this->generateOrderNumber(),
                 ]);
 
+                Log::info('Carrito confirmado', [
+                    'cart_id' => $cart->id,
+                    'order_number' => $cart->order_number,
+                ]);
+
                 $cartItems = $cart->cartItems;
 
                 foreach ($cartItems as $ct) {
@@ -125,24 +134,28 @@ class CheckoutService
     /**
      * Calcula el total del carrito.
      * @param \App\Models\Cart $cart
-     * @return int
+     * @return float
      */
-    private function calculateTotal(Cart $cart): int
+    private function calculateTotal(Cart $cart): float
     {
-        return (int) round(
-            $cart->cartItems->sum(fn($item) => $item->unit_price * $item->quantity) * 100
-        );
+        return
+            $cart->cartItems->sum(fn($item) => $item->unit_price * $item->quantity);
     }
 
     /**
      * Crea una sesión de checkout con Stripe.
      * @param \App\Models\User $user
      * @param \App\Models\Cart $cart
-     * @param int $amount
+    * @param float $amount Importe total en euros.
      * @return \Laravel\Cashier\Checkout
      */
-    private function createCheckoutSession(User $user, Cart $cart, int $amount)
+    private function createCheckoutSession(User $user, Cart $cart, float $amount)
     {
+        Log::info('Checkout iniciado', [
+            'user_id' => $user->id,
+            'cart_id' => $cart->id,
+            'total' => $amount,
+        ]);
 
         return $user->checkout([[
             'price_data' => [
@@ -150,7 +163,7 @@ class CheckoutService
                 'product_data' => [
                     'name' => 'Compra en mi tienda #' . $cart->id,
                 ],
-                'unit_amount' => $amount * 100,
+                'unit_amount' => (int) round($amount * 100),
             ],
             'quantity' => 1,
         ]], [
