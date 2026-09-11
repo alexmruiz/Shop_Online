@@ -30,22 +30,28 @@ class ReleaseExpiredCartReservations extends Command
      */
     public function handle()
     {
+        $released_units = 0;
         CartItem::whereNotNull('reserved_until')
             ->where('reserved_until', '<=', now())
             ->whereHas('cart', fn($q) => $q->where('status', CartStatus::PENDING))
             ->with(['cart.user', 'product'])
-            ->chunkById(100, function ($items) {
+            ->chunkById(100, function ($items) use (&$released_units) {
                 foreach ($items as $item) {
                     DB::transaction(function () use ($item) {
                         $item->cart->user?->notify(
                             new CartItemExpiredNotification($item)
                         );
                         $product = Product::lockForUpdate()->findOrFail($item->product_id);
+
                         $product->decrement('reserved_stock', $item->quantity);
                         $item->delete();
                     });
                 }
+                $released_units += $item->quantity;
             });
+        Log::info('Reservas expiradas liberadas', [
+            'released_items' => $released_units,
+        ]);
         $this->info('Reservas caducadas liberadas correctamente.');
     }
 }
