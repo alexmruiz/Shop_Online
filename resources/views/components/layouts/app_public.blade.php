@@ -28,6 +28,7 @@
     @include('components.layouts.partials-public.footer')
 
     @include('components.layouts.partials-public.scripts')
+    @stack('scripts')
     @livewireScripts
 </body>
 

@@ -69,7 +69,7 @@
             <!-- Botones alineados horizontalmente -->
             <div class="mt-4 d-flex justify-content-center gap-3">
                 <a href="{{ route('home') }}" class="btn btn-primary">Volver al inicio</a>
-                <a href="{{ route('generate.invoice') }}" target="_blank" class="btn btn-success">Descargar Factura</a>
+                <a href="{{ route('generate.invoice', ['cart_id' => $cart->id]) }}" target="_blank" class="btn btn-success">Descargar Factura</a>
             </div>
         </div>
     </x-card>
