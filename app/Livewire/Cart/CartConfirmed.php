@@ -24,18 +24,19 @@ class CartConfirmed extends Component
     {
         // Buscar por ID del carrito desde la URL o el más reciente con status = processing
         $cartId = request('cart_id');
-        
+
         if ($cartId) {
-            $this->cart = Auth::user()->carts()->find($cartId);
+            $cart = Auth::user()->carts()->find($cartId);
         } else {
-            $this->cart = Auth::user()->carts()->where('status', CartStatus::PROCESSING)->latest()->first();
+            $cart = Auth::user()->carts()->where('status', CartStatus::PROCESSING)->latest()->first();
         }
 
-        if (!$this->cart) {
+        if (!$cart) {
             session()->flash('error', 'No se encontró ningún pedido confirmado.');
             return redirect()->route('home');
         }
 
+        $this->cart = $cart;
         $service->cartStateManager($this->cart, '', true);
     }
     
@@ -45,7 +46,11 @@ class CartConfirmed extends Component
      */
     public function generateInvoice()
     {
-        return InvoiceFacade::generateInvoice($this->cart);
+        $cart = isset($this->cart)
+            ? $this->cart
+            : Auth::user()->carts()->findOrFail(request()->integer('cart_id'));
+
+        return InvoiceFacade::generateInvoice($cart);
     }
 
     #[Layout('components.layouts.app_public')]
