@@ -24,7 +24,7 @@ class CartItemFactory extends Factory
             'cart_id' => Cart::factory(),
             'product_id' => Product::factory(),
             'quantity' => $this->faker->numberBetween(1,20),
-            'unit_price' => 0, 
+            'unit_price' => 0,
 
         ];
     }
