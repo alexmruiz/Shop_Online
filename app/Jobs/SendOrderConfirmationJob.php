@@ -9,12 +9,18 @@ use Illuminate\Foundation\Queue\Queueable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
+use Throwable;
 
 class SendOrderConfirmationJob implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable;
 
     public Cart $cart;
+
+    public int $tries = 3;
+
+    public array $backoff = [60, 300, 900];
+
     /**
      * Create a new job instance.
      */
@@ -37,8 +43,10 @@ class SendOrderConfirmationJob implements ShouldQueue
             }
 
             Mail::to($cart->user->email)->send(new \App\Mail\OrderConfirmedMail($cart));
-        } catch (\Exception $e) {
+        } catch (Throwable $e) {
             Log::error('Error al enviar el correo de confirmación: ' . $e->getMessage());
+
+            throw $e;
         }
     }
 }
