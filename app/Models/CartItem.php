@@ -11,6 +11,13 @@ class CartItem extends Model
 
     protected $fillable = ['cart_id', 'product_id', 'quantity','unit_price', 'reserved_until'];
 
+    protected function casts(): array
+    {
+        return [
+            'reserved_until' => 'datetime',
+        ];
+    }
+
     public function product()
     {
         return $this->belongsTo(Product::class);
