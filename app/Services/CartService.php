@@ -134,6 +134,7 @@ class CartService
                         'product_id' => $item->product->id,
                         'quantity' => $item->quantity,
                         'price' => $item->unit_price,
+                        'reserved_until' => $item->reserved_until?->toIso8601String(),
                     ];
                 })->toArray(),
                 'total' => $cart->cartItems->sum(function ($item) {
