@@ -8,6 +8,7 @@ use App\Models\Product;
 use App\Notifications\CartItemExpiredNotification;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class ReleaseExpiredCartReservations extends Command
 {
