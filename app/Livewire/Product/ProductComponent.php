@@ -22,11 +22,12 @@ class ProductComponent extends Component
     public int $totalRegistros = 0;
     public string $search = '';
     public int $cant = 10;
+    public int $page = 1;
 
     // Propiedades del modelo
     public string $name;
     public int $productId = 0;
-    public int $categoryId;
+    public int $category_id = 0;
     public string $description;
     public float $price;
     public int $stock;
@@ -87,7 +88,7 @@ class ProductComponent extends Component
         $product->description = $this->description;
         $product->price = $this->price;
         $product->stock = $this->stock;
-        $product->category_id = $this->categoryId;
+        $product->category_id = $this->category_id;
         $product->is_active = $this->isActive;
         $product->save();
 
@@ -106,7 +107,7 @@ class ProductComponent extends Component
         $this->price = $product->price;
         $this->stock = $product->stock;
         $this->isActive = $product->is_active;
-        $this->categoryId = $product->category_id;
+        $this->category_id = $product->category_id;
         $this->image = $product->image;
 
         $this->dispatch('open-modal', 'modalProduct');
@@ -136,7 +137,7 @@ class ProductComponent extends Component
             'name' => $this->name,
             'description' => $this->description,
             'price' => $this->price,
-            'category_id' => $this->categoryId,
+            'category_id' => $this->category_id,
             'is_active' => $this->isActive,
             'stock' => $this->stock,
             'image' => $product->image,
@@ -150,7 +151,7 @@ class ProductComponent extends Component
     // Método encargado de la limpieza del modal
     public function clean()
     {
-        $this->reset(['productId', 'name', 'description', 'price', 'isActive', 'categoryId', 'stock']);
+        $this->reset(['productId', 'name', 'description', 'price', 'isActive', 'category_id', 'stock']);
         $this->resetErrorBag();
     }
 
