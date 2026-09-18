@@ -13,8 +13,22 @@ use Illuminate\Support\Facades\Log;
 
 class OrderConfirmationService
 {
-    public function confirm(Cart $cart)
+    /**
+     * Confirma el carrito: marca como confirmado, genera número de orden,
+     * reserva y decrementa stock de productos, limpia reservas temporales y
+     * encola jobs para generar factura y enviar confirmación.
+     * Ejecuta todo dentro de una transacción para asegurar consistencia.
+     * 
+     * @param Cart $cart
+     * @return void
+     */
+    public function confirm(Cart $cart): void
     {
+        if ($cart->status === CartStatus::CONFIRMED) {
+            Log::info("Carrito {$cart->id} ya estaba confirmado, ignorando confirmación duplicada");
+            return;
+        }
+
         DB::transaction(function () use ($cart) {
             $cart->update([
                 'status' => CartStatus::CONFIRMED,

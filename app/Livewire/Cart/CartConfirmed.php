@@ -37,9 +37,12 @@ class CartConfirmed extends Component
         }
 
         $this->cart = $cart;
-        $service->confirm($cart);
+        
+        if ($cart->status === CartStatus::PROCESSING) {
+            $service->confirm($cart);
+        }
     }
-    
+
     /**
      * Summary of generateInvoice
      * @return \Illuminate\Contracts\Routing\ResponseFactory|\Illuminate\Http\RedirectResponse|\Illuminate\Http\Response
