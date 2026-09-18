@@ -10,7 +10,7 @@ use Livewire\Component;
 #[Title('Ver Usuario')]
 class ClientShow extends Component
 {
-    public $user;
+    public User $user;
 
     public function mount(User $user)
     {
@@ -18,7 +18,7 @@ class ClientShow extends Component
         $this->user = $user->load('carts.cartItems.product');
     }
 
-    public function downloadInvoice($id)
+    public function downloadInvoice(int $id)
     {
         return InvoiceFacade::downloadInvoice($id);
     }

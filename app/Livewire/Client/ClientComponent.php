@@ -2,7 +2,6 @@
 
 namespace App\Livewire\Client;
 
-use App\Http\Requests\UserRequest;
 use App\Models\User;
 use Livewire\Component;
 use Livewire\Attributes\Title;
@@ -42,12 +41,17 @@ class ClientComponent extends Component
     /**
      * Valida y crea un usuario
      *
-     * @param UserRequest $request
      * @return void
      */
-    public function store(UserRequest $request): void
+    public function store(): void
     {
-        $request->validated();
+        $this->validate([
+            'name' => 'required|min:3|max:255',
+            'email' => 'required|email|max:255|unique:users,email',
+            'password' => 'required|min:6',
+            'confirmpassword' => 'required|same:password',
+            'role' => 'required|string|max:255',
+        ]);
 
         $user = new User();
 
@@ -85,12 +89,17 @@ class ClientComponent extends Component
      * Valida y actualiza un usuario
      *
      * @param User $user
-     * @param UserRequest $request
      * @return void
      */
-    public function update(User $user, UserRequest $request): void
+    public function update(User $user): void
     {
-        $request->validated();
+        $this->validate([
+            'name' => 'required|min:3|max:255',
+            'email' => "required|email|max:255|unique:users,email,{$user->id}",
+            'password' => 'required|min:6',
+            'confirmpassword' => 'required|same:password',
+            'role' => 'required|string|max:255',
+        ]);
 
         $user->update([
             'name' => $this->name,
