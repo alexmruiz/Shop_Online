@@ -92,7 +92,7 @@ Route::middleware(['locale'])->group(function () {
             $cartId = $request->get('cart_id');
             $cart = Auth::user()->carts()->find($cartId);
             if (!empty($cart)) {
-                $checkoutService->cartStateManager($cart, '', false, true);
+                $checkoutService->cancelled($cart);
             }
             return redirect()->route('home');
         })->name('checkout-cancel');
