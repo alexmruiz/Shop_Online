@@ -1,114 +1,108 @@
 <?php
 
-namespace Tests\Feature;
+namespace Tests\Feature\Livewire;
 
 use App\Livewire\Product\ProductComponent;
 use App\Models\Category;
-use Tests\TestCase;
 use App\Models\Product;
-use Livewire\Livewire;
-
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Livewire\Livewire;
+use Tests\TestCase;
 
 class ProductComponentTest extends TestCase
 {
-    use RefreshDatabase; //Limpia la base de datos después de cada prueba
+    use RefreshDatabase;
 
-    /** @test */
-    public function it_shows_products()
+    public function test_renders_product_component_successfully(): void
     {
-        $product = Product::factory()->create(['name' => 'Producto Test']);
+        Product::factory()->create(['name' => 'Producto Test']);
 
         Livewire::test(ProductComponent::class)
+            ->assertStatus(200)
             ->assertSee('Producto Test');
     }
 
-    /** @test */
-    public function it_filters_products_by_search(): void
+    public function test_filters_products_by_search_term(): void
     {
-        // Crear productos de prueba
-        $iphone = Product::factory()->create(['name' => 'iPhone 13']);
-        $samsung = Product::factory()->create(['name' => 'Samsung Galaxy S21']);
-
-        // Testear el componente con búsqueda
-        Livewire::test(ProductComponent::class)
-            ->set('search', 'iPhone') // Establece el término de búsqueda
-            ->assertSee('iPhone 13') // Verifica que se vea el producto iPhone
-            ->assertDontSee('Samsung Galaxy S21'); // Verifica que no se vea el producto Samsung
-    }
-
-    /** @test */
-    public function it_paginates_products(): void
-    {
-        // Creamos 7 productos de prueba. La paginación está configurada para mostrar 5 por página.
-        $products = Product::factory()->count(7)->create();
-
-        $productsDesc = $products->sortByDesc('id')->values(); // Ordenamos por ID descendente
+        Product::factory()->create(['name' => 'iPhone 13', 'is_active' => 1]);
+        Product::factory()->create(['name' => 'Samsung Galaxy S21', 'is_active' => 1]);
 
         Livewire::test(ProductComponent::class)
-            ->assertSee($productsDesc[0]->name) // Página 1, producto más reciente
-            ->assertSee($productsDesc[1]->name)
-            ->assertDontSee($productsDesc[5]->name);
+                ->set('search', 'iPhone')
+                ->assertSee('iPhone 13')
+                ->assertDontSee('Samsung Galaxy S21');
     }
 
-
-    /** @test */
-    public function it_creates_a_product(): void
+    public function test_paginates_products_correctly(): void
     {
-        $category = \App\Models\Category::factory()->create();
+        // Creamos 7 productos activos con nombres únicos
+        for ($i = 1; $i <= 7; $i++) {
+            Product::factory()->create(['name' => "Product {$i}", 'is_active' => 1]);
+        }
+
+        $latestProducts = Product::orderByDesc('id')->get()->values();
+
+        Livewire::test(ProductComponent::class)
+            ->set('cant', 5)
+            // Página 1: Verifica el más reciente y el límite de la pág 1
+            ->assertSee($latestProducts[0]->name)
+            ->assertSee($latestProducts[4]->name)
+            ->assertDontSee($latestProducts[5]->name)
+            // Navega a Página 2
+            ->call('gotoPage', 2)
+            ->assertSee($latestProducts[5]->name)
+            ->assertSee($latestProducts[6]->name);
+    }
+
+    public function test_creates_a_new_product_and_dispatches_events(): void
+    {
+        $category = Category::factory()->create();
 
         Livewire::test(ProductComponent::class)
             ->set('name', 'Nuevo Producto')
             ->set('description', 'Descripción del nuevo producto')
             ->set('price', 99.99)
+            ->set('stock', 10)
             ->set('category_id', $category->id)
             ->call('store')
+            ->assertDispatched('close-modal', 'modalProduct')
             ->assertDispatched('msg', 'Producto creado correctamente');
 
-        // Verificamos que el producto se haya creado en la base de datos
         $this->assertDatabaseHas('products', [
             'name' => 'Nuevo Producto',
             'description' => 'Descripción del nuevo producto',
             'price' => 99.99,
+            'category_id' => $category->id,
         ]);
     }
 
-    /** @test */
-    public function it_updates_a_product(): void
+    public function test_updates_an_existing_product(): void
     {
-        $category = \App\Models\Category::factory()->create();
-        $product = Product::factory()->create(['category_id' => $category->id]);
+        $product = Product::factory()->create();
 
         Livewire::test(ProductComponent::class)
-            ->call('edit', $product) // Llama al método edit con el producto
+            ->call('edit', $product)
             ->set('name', 'Producto Actualizado')
-            ->call('update', $product) // Llama al método update con el producto
+            ->call('update', $product)
+            ->assertDispatched('close-modal', 'modalProduct')
             ->assertDispatched('msg', 'Producto editado correctamente');
 
-
-        // Verificamos que el producto se haya actualizado en la base de datos
         $this->assertDatabaseHas('products', [
             'id' => $product->id,
             'name' => 'Producto Actualizado',
         ]);
     }
 
-    /** @test */
-    public function it_deletes_a_product(): void
+    public function test_deletes_a_product_on_destroy_event(): void
     {
-        $product = Product::factory()->create(['name' => 'Producto a eliminar']);
+        $product = Product::factory()->create();
 
         Livewire::test(ProductComponent::class)
-            ->call('destroy', $product->id) // Llama al método delete con el ID del producto
-            ->assertDispatched('msg', 'El producto ha sido eliminado correctamente'); 
+            ->dispatch('destroyProduct', $product->id)
+            ->assertDispatched('msg', 'El producto ha sido eliminado correctamente');
 
-        // Verificamos que el producto se haya eliminado de la base de datos
         $this->assertDatabaseMissing('products', [
             'id' => $product->id,
         ]);
-        
     }
-
-
-
 }

@@ -37,7 +37,7 @@ class CartConfirmed extends Component
         }
 
         $this->cart = $cart;
-        $this->checkoutService->cartStateManager($cart, '', isAcepted: true);
+        $service->cartStateManager($cart, '', isAcepted: true);
     }
     
     /**

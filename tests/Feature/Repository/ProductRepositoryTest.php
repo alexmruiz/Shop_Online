@@ -2,12 +2,13 @@
 
 namespace Tests\Feature\Repository;
 
-
-use Tests\TestCase;
-use App\Models\Product;
 use App\Models\Category;
+use App\Models\Product;
 use App\Repositories\ProductRepository;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Pagination\LengthAwarePaginator;
+use PHPUnit\Framework\Attributes\Test;
+use Tests\TestCase;
 
 class ProductRepositoryTest extends TestCase
 {
@@ -16,8 +17,7 @@ class ProductRepositoryTest extends TestCase
     protected ProductRepository $repo;
 
     /**
-     * Configura el entorno de prueba
-     * @return void
+     * Configura el entorno de prueba.
      */
     protected function setUp(): void
     {
@@ -25,8 +25,8 @@ class ProductRepositoryTest extends TestCase
         $this->repo = new ProductRepository();
     }
 
-    /** @test */
-    public function it_returns_all_categories()
+    #[Test]
+    public function it_returns_all_categories(): void
     {
         Category::factory()->count(3)->create();
 
@@ -35,20 +35,19 @@ class ProductRepositoryTest extends TestCase
         $this->assertCount(3, $categories);
     }
 
-    /** @test */
-    public function it_returns_products_paginated()
+    #[Test]
+    public function it_returns_products_paginated(): void
     {
         Product::factory()->count(10)->create();
 
         $result = $this->repo->searchAndFilter(null, null, 5);
 
-        // Contamos los elementos de la página actual
-        $this->assertCount(5, $result->items()); 
-        $this->assertInstanceOf(\Illuminate\Pagination\LengthAwarePaginator::class, $result);
+        $this->assertCount(5, $result->items());
+        $this->assertInstanceOf(LengthAwarePaginator::class, $result);
     }
 
-    /** @test */
-    public function it_filters_products_by_category()
+    #[Test]
+    public function it_filters_products_by_category(): void
     {
         $cat1 = Category::factory()->create();
         $cat2 = Category::factory()->create();
@@ -59,14 +58,15 @@ class ProductRepositoryTest extends TestCase
         $result = $this->repo->searchAndFilter(null, $cat1->id, 5);
 
         $this->assertCount(3, $result->items());
-
-        foreach ($result->items() as $product) {
-            $this->assertEquals($cat1->id, $product->category_id);
-        }
+        
+        // Uso de la colección de Eloquent para verificar que todos pertenezcan a la categoría 1
+        $this->assertTrue(
+            $result->getCollection()->every(fn ($product) => $product->category_id === $cat1->id)
+        );
     }
 
-    /** @test */
-    public function it_filters_products_by_search_term()
+    #[Test]
+    public function it_filters_products_by_search_term(): void
     {
         Product::factory()->create(['name' => 'Laptop']);
         Product::factory()->create(['name' => 'Smartphone']);
