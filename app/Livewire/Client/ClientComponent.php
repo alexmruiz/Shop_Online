@@ -3,6 +3,7 @@
 namespace App\Livewire\Client;
 
 use App\Models\User;
+use Illuminate\Support\Facades\Hash;
 use Livewire\Component;
 use Livewire\Attributes\Title;
 use Livewire\WithPagination;
@@ -57,7 +58,7 @@ class ClientComponent extends Component
 
         $user->name = $this->name;
         $user->email = $this->email;
-        $user->password = bcrypt($this->password);
+        $user->password = Hash::make($this->password);
         $user->role = $this->role;
         $user->save();
 
@@ -104,7 +105,7 @@ class ClientComponent extends Component
         $user->update([
             'name' => $this->name,
             'email' => $this->email,
-            'password' => bcrypt($this->password),
+            'password' => Hash::make($this->password),
             'role' => $this->role,
         ]);
 
