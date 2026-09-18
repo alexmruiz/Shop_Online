@@ -169,6 +169,9 @@ class CheckoutService
         ]], [
             'success_url' => route('confirmed', ['cart_id' => $cart->id]),
             'cancel_url' => route('checkout-cancel', ['cart_id' => $cart->id]),
+            'metadata' => [
+                'cart_id' => $cart->id
+            ]
         ]);
     }
 
