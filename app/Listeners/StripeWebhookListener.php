@@ -16,11 +16,10 @@ class StripeWebhookListener
 
     public function handle(WebhookReceived $event): void
     {
-        // $event->payload es el JSON completo que Stripe envió, ya decodificado como array
         $type = $event->payload['type'] ?? null;
 
         if ($type !== 'checkout.session.completed') {
-            return; // ignoramos cualquier otro tipo de evento que Stripe nos mande
+            return;
         }
 
         $session = $event->payload['data']['object'] ?? null;
@@ -30,8 +29,6 @@ class StripeWebhookListener
             return;
         }
 
-        // Necesitas identificar a qué Cart pertenece esta sesión.
-        // Cashier permite adjuntar metadata al crear la sesión de checkout (ver paso siguiente).
         $cartId = $session['metadata']['cart_id'] ?? null;
 
         if (empty($cartId)) {
