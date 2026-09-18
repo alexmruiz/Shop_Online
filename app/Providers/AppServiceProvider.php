@@ -3,6 +3,9 @@
 namespace App\Providers;
 
 use Illuminate\Support\ServiceProvider;
+use Illuminate\Support\Facades\Event;
+use Laravel\Cashier\Events\WebhookReceived;
+use App\Listeners\StripeWebhookListener;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -19,6 +22,7 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        //
+        // Registrar el listener de Stripe/Cashier para webhooks
+        Event::listen(WebhookReceived::class, [StripeWebhookListener::class, 'handle']);
     }
 }
