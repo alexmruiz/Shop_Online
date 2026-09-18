@@ -5,7 +5,7 @@ namespace App\Livewire\Cart;
 use App\Enums\CartStatus;
 use App\Facades\InvoiceFacade;
 use App\Models\Cart;
-use App\Services\CheckoutService;
+use App\Services\OrderConfirmationService;
 use Illuminate\Support\Facades\Auth;
 use Livewire\Attributes\Layout;
 use Livewire\Attributes\Title;
@@ -20,7 +20,7 @@ class CartConfirmed extends Component
 {
     public Cart $cart;
 
-    public function mount(CheckoutService $service)
+    public function mount(OrderConfirmationService $service)
     {
         // Buscar por ID del carrito desde la URL o el más reciente con status = processing
         $cartId = request('cart_id');
@@ -37,9 +37,12 @@ class CartConfirmed extends Component
         }
 
         $this->cart = $cart;
-        $service->cartStateManager($cart, '', isAcepted: true);
+        
+        if ($cart->status === CartStatus::PROCESSING) {
+            $service->confirm($cart);
+        }
     }
-    
+
     /**
      * Summary of generateInvoice
      * @return \Illuminate\Contracts\Routing\ResponseFactory|\Illuminate\Http\RedirectResponse|\Illuminate\Http\Response
