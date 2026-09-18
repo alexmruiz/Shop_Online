@@ -18,10 +18,6 @@ class StripeWebhookListener
     {
         $type = $event->payload['type'] ?? null;
 
-        if ($type !== 'checkout.session.completed') {
-            return;
-        }
-
         $session = $event->payload['data']['object'] ?? null;
 
         if (empty($session)) {
@@ -42,6 +38,12 @@ class StripeWebhookListener
             Log::error("Webhook de Stripe: carrito {$cartId} no encontrado");
             return;
         }
+
+        if ($type !== 'checkout.session.completed') {
+            $this->checkoutService->cartStateManager($cart, '', false, true);
+            return;
+        }
+
 
         // Idempotencia: si el carrito ya está confirmado, no lo proceses dos veces
         if ($cart->status === CartStatus::CONFIRMED) {
