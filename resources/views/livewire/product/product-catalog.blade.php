@@ -62,7 +62,21 @@
                     <div class="col-md-4 col-sm-6 col-12 mb-4">
                         <div class="card h-100 shadow-sm border-0 rounded-3">
                             <!-- Imagen del Producto -->
-                            <x-image-product :product="$product" class="image-product" />
+                            <div class="position-relative">
+                                <x-image-product :product="$product" class="image-product" />
+
+                                @auth
+                                    <button type="button"
+                                            wire:click="toggleFavorite({{ $product->id }})"
+                                            wire:loading.attr="disabled"
+                                            wire:target="toggleFavorite({{ $product->id }})"
+                                            class="btn btn-light text-danger position-absolute top-0 end-0 m-2 rounded-circle shadow-sm"
+                                            aria-label="{{ in_array($product->id, $favoriteIds) ? 'Quitar de favoritos' : 'Añadir a favoritos' }}"
+                                            aria-pressed="{{ in_array($product->id, $favoriteIds) ? 'true' : 'false' }}">
+                                        <i class="bi {{ in_array($product->id, $favoriteIds) ? 'bi-bookmark-heart-fill' : 'bi-bookmark-heart' }}"></i>
+                                    </button>
+                                @endauth
+                            </div>
 
                            <!-- Detalles del Producto -->
                             <div class="card-body d-flex flex-column text-center">
