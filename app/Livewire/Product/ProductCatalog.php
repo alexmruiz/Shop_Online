@@ -5,6 +5,7 @@ namespace App\Livewire\Product;
 use App\Facades\Cart as CartFacade;
 use App\Models\Category;
 use App\Models\Product;
+use App\Models\User;
 use App\Repositories\ProductRepository;
 use App\Services\CartService;
 use App\Services\ProductService;
@@ -92,20 +93,22 @@ class ProductCatalog extends Component
     #[Layout('components.layouts.app_public')]
     public function render(ProductRepository $repository, CartService $cartService)
     {
-        if(!$this->cartService) {
+        if (!$this->cartService) {
             $this->cartService = $cartService;
         }
-        
+
         $products = $repository->searchAndFilter(
             $this->search,
             $this->selectedCategory,
             $this->cant
         );
 
-        foreach($products as &$product) {
+        foreach ($products as &$product) {
             $total = $product->stock - $product->reserved_stock;
             $product['available_stock'] = $total;
         }
+
+        $favoriteIds = Auth::check() ? Auth::user()->favoriteProducts()->pluck('products.id')->all() : [];
 
         $cart = Auth::user() ? $this->cartService->getOrCreatePendingCart() : null;
 
@@ -117,6 +120,23 @@ class ProductCatalog extends Component
         return view('livewire.product.product-catalog', [
             'products' => $products,
             'categories' => $repository->getAllCategories(),
+            'favoriteIds' => $favoriteIds
         ]);
+    }
+
+    public function toggleFavorite(int $productId): void
+    {
+        /** @var User|null $user */
+        $user = Auth::user();
+
+        if (! $user) {
+            $this->redirectRoute('login', navigate: true);
+            return;
+        }
+
+        // findOrFail respeta tu ActiveProductScope: no se pueden marcar productos inactivos o inexistentes
+        $product = Product::findOrFail($productId);
+
+        $user->favoriteProducts()->toggle($product->id);
     }
 }

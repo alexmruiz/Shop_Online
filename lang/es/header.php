@@ -9,4 +9,5 @@ return [
     'language' => 'Idioma',
     'spanish' => 'Español',
     'english' => 'Inglés',
+    'favorites' => 'Favorites'
 ];

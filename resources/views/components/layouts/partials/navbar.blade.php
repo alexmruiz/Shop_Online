@@ -22,7 +22,8 @@
       <li class="nav-item">
           <form action="simple-results.html">
             <div class="input-group">
-                <input type="search" class="form-control" placeholder="Buscar Producto...">
+                <label for="navbar-product-search" class="sr-only">Buscar Producto</label>
+                <input type="search" id="navbar-product-search" class="form-control" placeholder="Buscar Producto...">
                 <div class="input-group-append">
                     <button type="submit" class="btn btn-default">
                         <i class="fa fa-search"></i>
@@ -34,16 +35,16 @@
       
       <li class="nav-item dropdown user-menu">
         <a href="#" class="nav-link dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
-          <img src="{{ asset('assets/dist/img/avatar5.png') }}" class="user-image img-circle elevation-2" alt="User Image">
-          <span class="d-none d-md-inline">{{ Auth::user()->name }}</span>
+          <img src="{{ asset('assets/dist/img/avatar5.png') }}" class="user-image img-circle elevation-2" alt="User img">
+          <span class="d-none d-md-inline">{{ auth()->user()->name }}</span>
         </a>
         <ul class="dropdown-menu dropdown-menu-lg dropdown-menu-right" style="left: inherit; right: 0px;">
           <!-- User image -->
           <li class="user-header bg-lightblue">
-            <img src="{{ asset('assets/dist/img/avatar5.png') }}" class="img-circle elevation-2" alt="User Image">
+            <img src="{{ asset('assets/dist/img/avatar5.png') }}" class="img-circle elevation-2" alt="User img">
   
             <p>
-              {{ Auth::user()->name }}
+              {{ auth()->user()->name }}
             </p>
           </li>
           <!-- Menu Body -->
