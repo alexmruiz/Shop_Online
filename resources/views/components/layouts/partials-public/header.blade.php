@@ -19,6 +19,13 @@
                     <li class="nav-item">
                         <a class="nav-link text-uppercase" href="#about">{{ __('header.about') }}</a>
                     </li>
+                    <li class="nav-item">
+                        <a class="nav-link text-uppercase"
+                        href="{{ route('favorites') }}"
+                        wire:navigate>
+                            {{ __('header.favorites') }}
+                        </a>
+                    </li>
                 </ul>
 
                 <div class="d-flex align-items-center gap-3">
