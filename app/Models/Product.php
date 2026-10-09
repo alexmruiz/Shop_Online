@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Support\Facades\DB;
 
 #[ScopedBy(ActiveProductScope::class)]
@@ -65,6 +66,12 @@ class Product extends Model
             ->orderByDesc('total_sold')
             ->limit($limit)
             ->get();
+    }
+
+    public function favoritedBy(): BelongsToMany
+    {
+        return $this->belongsToMany(User::class, 'favorite_products')
+        ->withTimestamps();
     }
 
 }
