@@ -12,6 +12,7 @@ use App\Livewire\Client\ClientComponent;
 use App\Livewire\Client\ClientShow;
 use App\Livewire\Home\DashboardComponent;
 use App\Livewire\Orders\MyOrders;
+use App\Livewire\Product\FavoriteProducts;
 use App\Livewire\Product\ProductCatalog;
 use App\Livewire\Product\ProductShow;
 use App\Services\CheckoutService;
@@ -86,6 +87,8 @@ Route::middleware(['locale'])->group(function () {
 
         //Descargar facturas(Mis facturas)
         Route::get('/invoice/download/{id}', [MyOrders::class, 'downloadInvoice'])->name('download.invoice');
+
+        Route::get('/productosfavoritos', FavoriteProducts::class)->name('favorites');
 
         //Pago cancelado
         Route::get('/checkout-cancel', function (Request $request, CheckoutService $checkoutService) {
