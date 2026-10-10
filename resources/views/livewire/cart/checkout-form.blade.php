@@ -13,17 +13,17 @@
                         </div>
                         <div class="col-md-4 mb-3">
                             <label for="postalCode" class="form-label">{{ __('checkout.postal_code') }}</label>
-                            <input type="text" id="postalCode" wire:model.live="postalCode" class="form-control" placeholder="{{ __('checkout.postal_code_placeholder') }}" />
+                            <input type="text" id="postalCode" wire:model.live.debounce.500ms="postalCode" class="form-control" placeholder="{{ __('checkout.postal_code_placeholder') }}" />
                             @error('postalCode') <span class="text-danger small">{{ $message }}</span> @enderror
                         </div>
                         <div class="col-md-4 mb-3">
                             <label for="city" class="form-label">{{ __('checkout.city') }}</label>
-                            <input type="text" id="city" wire:model.live="city" class="form-control" placeholder="{{ __('checkout.city_placeholder') }}" />
+                            <input type="text" id="city" wire:model.live="city" class="form-control" readonly   />
                             @error('city') <span class="text-danger small">{{ $message }}</span> @enderror
                         </div>
                         <div class="col-md-4 mb-3">
                             <label for="province" class="form-label">{{ __('checkout.province') }}</label>
-                            <input type="text" id="province" wire:model.live="province" class="form-control" placeholder="{{ __('checkout.province_placeholder') }}" />
+                            <input type="text" id="province" wire:model.live="province" class="form-control" readonly />
                             @error('province') <span class="text-danger small">{{ $message }}</span> @enderror
                         </div>
                     </div>

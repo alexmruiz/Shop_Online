@@ -4,8 +4,10 @@ namespace App\Livewire\Cart;
 
 use App\Services\CheckoutService;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Http;
 use Livewire\Attributes\Layout;
 use Livewire\Attributes\Title;
+use Livewire\Attributes\Validate;
 use Livewire\Component;
 
 #[Title('Checkout')]
@@ -14,6 +16,7 @@ class CheckoutForm extends Component
 {
     public string $street = '';
     public string $city = '';
+    #[Validate('required|digits:5')]
     public string $postalCode = '';
     public string $province = '';
     public bool $saveAsDefault = true;
@@ -100,5 +103,24 @@ class CheckoutForm extends Component
     public function render()
     {
         return view('livewire.cart.checkout-form');
+    }
+
+    public function updatedPostalCode()
+    {
+
+        $apiUrl = 'https://api.zippopotam.us/es/' . $this->postalCode;
+
+        $response = Http::get($apiUrl);
+
+        if (!$response->successful()) {
+            return false;
+        }
+
+        $data = $response->json();
+
+        foreach ($data['places'] as $places) {
+            $this->city = $places['place name'];
+            $this->province = $places['state'];
+        }
     }
 }
