@@ -8,6 +8,7 @@ return [
     'postal_code' => 'Postal Code',
     'postal_code_placeholder' => 'Ex: 28001',
     'city' => 'City',
+    'city_select_placeholder' => 'Select a city',
     'city_placeholder' => 'Ex: Madrid',
     'province' => 'Province',
     'province_placeholder' => 'Ex: Madrid',

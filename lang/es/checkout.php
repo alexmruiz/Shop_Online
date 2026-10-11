@@ -8,6 +8,7 @@ return [
     'postal_code' => 'Código Postal',
     'postal_code_placeholder' => 'Ej: 28001',
     'city' => 'Ciudad',
+    'city_select_placeholder' => 'Selecciona una ciudad',
     'city_placeholder' => 'Ej: Madrid',
     'province' => 'Provincia',
     'province_placeholder' => 'Ej: Madrid',

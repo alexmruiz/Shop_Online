@@ -3,8 +3,8 @@
 namespace App\Livewire\Cart;
 
 use App\Services\CheckoutService;
+use App\Services\PostalCodeService;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Http;
 use Livewire\Attributes\Layout;
 use Livewire\Attributes\Title;
 use Livewire\Attributes\Validate;
@@ -19,6 +19,7 @@ class CheckoutForm extends Component
     #[Validate('required|digits:5')]
     public string $postalCode = '';
     public string $province = '';
+    public array $cityOptions = [];
     public bool $saveAsDefault = true;
 
     public array $originalAddress = [];
@@ -42,6 +43,7 @@ class CheckoutForm extends Component
             $this->city = $userAddress['city'] ?? '';
             $this->postalCode = (string)($userAddress['postalCode'] ?? '');
             $this->province = $userAddress['province'] ?? '';
+            $this->cityOptions = [$userAddress['city']] ?? [];
         }
 
         // Guarda una copia asociativa idéntica de la dirección inicial
@@ -81,6 +83,7 @@ class CheckoutForm extends Component
      */
     public function processPayment(CheckoutService $checkoutService)
     {
+
         $this->validate();
 
         $newAddress = $this->getCurrentAddressData();
@@ -105,22 +108,18 @@ class CheckoutForm extends Component
         return view('livewire.cart.checkout-form');
     }
 
-    public function updatedPostalCode()
+    /**
+     * LLama al servicio cuando se actualiza el código postal y recibe un
+     * array con ciudades un sring con la provincia
+     *
+     * @param PostalCodeService $postalcodeService
+     * @return void
+     */
+    public function updatedPostalCode(PostalCodeService $postalcodeService): void
     {
+        $dataCity = $postalcodeService->updatedPostalCode($this->postalCode);
 
-        $apiUrl = 'https://api.zippopotam.us/es/' . $this->postalCode;
-
-        $response = Http::get($apiUrl);
-
-        if (!$response->successful()) {
-            return false;
-        }
-
-        $data = $response->json();
-
-        foreach ($data['places'] as $places) {
-            $this->city = $places['place name'];
-            $this->province = $places['state'];
-        }
+        $this->cityOptions = $dataCity['city'] ?? [];
+        $this->province = $dataCity['province'] ?? '';
     }
 }

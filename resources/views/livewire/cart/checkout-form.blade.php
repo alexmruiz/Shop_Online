@@ -18,7 +18,12 @@
                         </div>
                         <div class="col-md-4 mb-3">
                             <label for="city" class="form-label">{{ __('checkout.city') }}</label>
-                            <input type="text" id="city" wire:model.live="city" class="form-control" readonly   />
+                            <select id="city" wire:model.live="city" class="form-select" @disabled(empty($cityOptions))>
+                                <option value="" disabled selected hidden>{{ __('checkout.city_select_placeholder') }}</option>
+                                @foreach ($cityOptions as $cityOption)
+                                    <option value="{{ $cityOption }}">{{ $cityOption }}</option>
+                                @endforeach
+                            </select>
                             @error('city') <span class="text-danger small">{{ $message }}</span> @enderror
                         </div>
                         <div class="col-md-4 mb-3">
