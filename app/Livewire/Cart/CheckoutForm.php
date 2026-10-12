@@ -14,15 +14,19 @@ use Livewire\Component;
 #[Layout('components.layouts.app_public')]
 class CheckoutForm extends Component
 {
-    public string $street = '';
-    public string $city = '';
     #[Validate('required|digits:5')]
     public string $postalCode = '';
+
+    public string $street = '';
+    public string $city = '';
     public string $province = '';
     public array $cityOptions = [];
     public bool $saveAsDefault = true;
+    public bool $apiAvailable = true;
 
     public array $originalAddress = [];
+
+    protected PostalCodeService $postalCodeService;
 
     protected function rules(): array
     {
@@ -112,14 +116,27 @@ class CheckoutForm extends Component
      * LLama al servicio cuando se actualiza el código postal y recibe un
      * array con ciudades un sring con la provincia
      *
-     * @param PostalCodeService $postalcodeService
+     * @param String $postalCode
      * @return void
      */
-    public function updatedPostalCode(PostalCodeService $postalcodeService): void
+    public function updatedPostalCode(String $postalCode): void
     {
-        $dataCity = $postalcodeService->updatedPostalCode($this->postalCode);
+        $dataCity = $this->postalCodeService->updatedPostalCode($postalCode);
 
-        $this->cityOptions = $dataCity['city'] ?? [];
+        $this->cityOptions = $dataCity['cities'] ?? [];
         $this->province = $dataCity['province'] ?? '';
+        $this->apiAvailable = $dataCity['available'];
+
+        if (key_exists('found', $dataCity) && !$dataCity['found']) {
+            $this->addError(
+                'postalCode',
+                'No encontramos ese código postal. Comprueba el código e inténtalo de nuevo.'
+            );
+        }
+    }
+
+    public function boot(PostalCodeService $postalCodeService): void
+    {
+        $this->postalCodeService = $postalCodeService;
     }
 }

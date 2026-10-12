@@ -18,17 +18,21 @@
                         </div>
                         <div class="col-md-4 mb-3">
                             <label for="city" class="form-label">{{ __('checkout.city') }}</label>
-                            <select id="city" wire:model.live="city" class="form-select" @disabled(empty($cityOptions))>
-                                <option value="" disabled selected hidden>{{ __('checkout.city_select_placeholder') }}</option>
-                                @foreach ($cityOptions as $cityOption)
-                                    <option value="{{ $cityOption }}">{{ $cityOption }}</option>
-                                @endforeach
-                            </select>
+                            @if($apiAvailable)
+                                <select id="city" wire:model.live="city" class="form-select" @disabled(empty($cityOptions))>
+                                    <option value="" disabled selected hidden>{{ __('checkout.city_select_placeholder') }}</option>
+                                    @foreach ($cityOptions as $cityOption)
+                                        <option value="{{ $cityOption }}">{{ $cityOption }}</option>
+                                    @endforeach
+                                </select>
+                            @else
+                                <input type="text" id="city" wire:model.live="city" class="form-control" />
+                            @endif
                             @error('city') <span class="text-danger small">{{ $message }}</span> @enderror
                         </div>
                         <div class="col-md-4 mb-3">
                             <label for="province" class="form-label">{{ __('checkout.province') }}</label>
-                            <input type="text" id="province" wire:model.live="province" class="form-control" readonly />
+                            <input type="text" id="province" wire:model.live="province" class="form-control" @readonly($apiAvailable ?? false) />
                             @error('province') <span class="text-danger small">{{ $message }}</span> @enderror
                         </div>
                     </div>

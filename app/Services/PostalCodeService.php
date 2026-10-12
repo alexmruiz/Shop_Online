@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
 
 class PostalCodeService
 {
@@ -17,26 +18,45 @@ class PostalCodeService
     {
         $apiUrl = 'https://api.zippopotam.us/es/' . $postalCode;
 
-        $response = Http::get($apiUrl);
+        try {
+            $response = Http::connectTimeout(2)->timeout(4)->get($apiUrl);
+        } catch (\Throwable $th) {
+            report($th);
+            return [
+                'available' => false,
+                'cities' => [],
+                'province' => '',
+            ];
+        }
 
         if (!$response->successful()) {
-            return [];
+            return [
+                'available' => true,
+                'cities' => [],
+                'province' => '',
+                'found' => false
+            ];
         }
 
         $data = $response->json();
 
-        $city = [];
+        $cities = [];
 
         if (!empty($data['places'])) {
             foreach ($data['places'] as $places) {
-                $city[$places['place name']] = $places['place name'] ?? '';
+                $cities[$places['place name']] = $places['place name'] ?? '';
             }
             return [
-                'city' => $city,
-                'province' => $data['places'][0]['state']
+                'cities' => $cities,
+                'province' => $data['places'][0]['state'],
+                'available' => true
             ];
         }
 
-        return $city;
+        return [
+            'cities' => [],
+            'province' => '',
+            'available' => false
+        ];
     }
 }
