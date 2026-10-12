@@ -82,7 +82,7 @@ class CheckoutFormTest extends TestCase
             ->assertSet('cityOptions', [])
             ->assertSet('province', '')
             ->assertHasErrors('postalCode')
-            ->assertSee('No encontramos ese código postal.');
+            ->assertSee(__('checkout.postal_code_not_found'));
     }
 
     #[Test]

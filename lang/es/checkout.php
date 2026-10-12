@@ -7,6 +7,7 @@ return [
     'street_placeholder' => 'Calle, número, piso',
     'postal_code' => 'Código Postal',
     'postal_code_placeholder' => 'Ej: 28001',
+    'postal_code_not_found' => 'No encontramos ese código postal. Comprueba el código e inténtalo de nuevo.',
     'city' => 'Ciudad',
     'city_select_placeholder' => 'Selecciona una ciudad',
     'city_placeholder' => 'Ej: Madrid',

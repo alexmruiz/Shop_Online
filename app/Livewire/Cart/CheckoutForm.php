@@ -131,7 +131,7 @@ class CheckoutForm extends Component
         if (key_exists('found', $dataCity) && !$dataCity['found']) {
             $this->addError(
                 'postalCode',
-                'No encontramos ese código postal. Comprueba el código e inténtalo de nuevo.'
+                __('checkout.postal_code_not_found')
             );
         }
     }
