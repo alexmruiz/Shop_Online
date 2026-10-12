@@ -3,7 +3,6 @@
 namespace App\Services;
 
 use Illuminate\Support\Facades\Http;
-use Illuminate\Support\Facades\Log;
 
 class PostalCodeService
 {
@@ -41,22 +40,23 @@ class PostalCodeService
         $data = $response->json();
 
         $cities = [];
+        $province = '';
+        $available = false;
 
         if (!empty($data['places'])) {
             foreach ($data['places'] as $places) {
                 $cities[$places['place name']] = $places['place name'] ?? '';
             }
-            return [
-                'cities' => $cities,
-                'province' => $data['places'][0]['state'],
-                'available' => true
-            ];
+
+            $province = $data['places'][0]['state'];
+            $available = true;
+            
         }
 
         return [
-            'cities' => [],
-            'province' => '',
-            'available' => false
+            'cities' => $cities,
+            'province' => $province,
+            'available' => $available
         ];
     }
 }

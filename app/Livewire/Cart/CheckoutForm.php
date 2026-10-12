@@ -123,6 +123,7 @@ class CheckoutForm extends Component
     {
         $dataCity = $this->postalCodeService->updatedPostalCode($postalCode);
 
+        $this->city = '';
         $this->cityOptions = $dataCity['cities'] ?? [];
         $this->province = $dataCity['province'] ?? '';
         $this->apiAvailable = $dataCity['available'];
