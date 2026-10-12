@@ -3,22 +3,30 @@
 namespace App\Livewire\Cart;
 
 use App\Services\CheckoutService;
+use App\Services\PostalCodeService;
 use Illuminate\Support\Facades\Auth;
 use Livewire\Attributes\Layout;
 use Livewire\Attributes\Title;
+use Livewire\Attributes\Validate;
 use Livewire\Component;
 
 #[Title('Checkout')]
 #[Layout('components.layouts.app_public')]
 class CheckoutForm extends Component
 {
+    #[Validate('required|digits:5')]
+    public string $postalCode = '';
+
     public string $street = '';
     public string $city = '';
-    public string $postalCode = '';
     public string $province = '';
+    public array $cityOptions = [];
     public bool $saveAsDefault = true;
+    public bool $apiAvailable = true;
 
     public array $originalAddress = [];
+
+    protected PostalCodeService $postalCodeService;
 
     protected function rules(): array
     {
@@ -39,6 +47,7 @@ class CheckoutForm extends Component
             $this->city = $userAddress['city'] ?? '';
             $this->postalCode = (string)($userAddress['postalCode'] ?? '');
             $this->province = $userAddress['province'] ?? '';
+            $this->cityOptions = [$userAddress['city']] ?? [];
         }
 
         // Guarda una copia asociativa idéntica de la dirección inicial
@@ -78,6 +87,7 @@ class CheckoutForm extends Component
      */
     public function processPayment(CheckoutService $checkoutService)
     {
+
         $this->validate();
 
         $newAddress = $this->getCurrentAddressData();
@@ -100,5 +110,34 @@ class CheckoutForm extends Component
     public function render()
     {
         return view('livewire.cart.checkout-form');
+    }
+
+    /**
+     * LLama al servicio cuando se actualiza el código postal y recibe un
+     * array con ciudades un sring con la provincia
+     *
+     * @param String $postalCode
+     * @return void
+     */
+    public function updatedPostalCode(String $postalCode): void
+    {
+        $dataCity = $this->postalCodeService->updatedPostalCode($postalCode);
+
+        $this->city = '';
+        $this->cityOptions = $dataCity['cities'] ?? [];
+        $this->province = $dataCity['province'] ?? '';
+        $this->apiAvailable = $dataCity['available'];
+
+        if (key_exists('found', $dataCity) && !$dataCity['found']) {
+            $this->addError(
+                'postalCode',
+                __('checkout.postal_code_not_found')
+            );
+        }
+    }
+
+    public function boot(PostalCodeService $postalCodeService): void
+    {
+        $this->postalCodeService = $postalCodeService;
     }
 }

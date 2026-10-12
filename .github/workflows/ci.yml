@@ -25,11 +25,23 @@ jobs:
       uses: actions/checkout@v4
 
     - name: Setup PHP
-      uses: shivammathur/setup-php@v2
+      uses: shivammathur/setup-php@eb7c497e18156a6bbabfef1d3a82760b9eda3962
       with:
         php-version: '8.2'
         extensions: mbstring, dom, fileinfo, mysql, pdo_mysql, redis
         coverage: none
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20'
+        cache: npm
+
+    - name: Install Node Dependencies
+      run: npm ci
+
+    - name: Build Frontend Assets
+      run: npm run build
 
     - name: Get Composer Cache Directory
       id: composer-cache
@@ -46,10 +58,8 @@ jobs:
     - name: Install Dependencies
       run: composer install --no-ansi --no-interaction --no-scripts --no-progress --prefer-dist
 
-    - name: Prepare Laravel Environment
-      run: |
-        cp .env.example .env
-        php artisan key:generate
+    - name: Generate Laravel Application Key
+      run: echo "APP_KEY=$(php artisan key:generate --show)" >> "$GITHUB_ENV"
 
     - name: Run Tests
       env:
