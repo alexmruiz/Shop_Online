@@ -46,10 +46,8 @@ jobs:
     - name: Install Dependencies
       run: composer install --no-ansi --no-interaction --no-scripts --no-progress --prefer-dist
 
-    - name: Prepare Laravel Environment
-      run: |
-        cp .env.example .env
-        php artisan key:generate
+    - name: Generate Laravel Application Key
+      run: echo "APP_KEY=$(php artisan key:generate --show)" >> "$GITHUB_ENV"
 
     - name: Run Tests
       env:
