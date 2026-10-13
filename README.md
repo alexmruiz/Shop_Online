@@ -107,11 +107,26 @@ php artisan serve
 - Las facturas se generan desde vistas Blade y se procesan con Dompdf. Revisa `app/Services/InvoiceService.php` y `app/Providers/InvoiceServiceProvider.php`.
 
 ## Pruebas
+
 - Ejecutar pruebas:
 
 ```bash
 php artisan test
 ```
+
+## Análisis con SonarQube Cloud
+
+El análisis estático se ejecuta en GitHub Actions usando `sonar-project.properties`.
+Configura un secreto de Actions llamado `SONAR_TOKEN` con un token de SonarQube
+Cloud; no guardes el token en el repositorio. El análisis requiere que el proyecto
+`alexmruiz_Shop_Online` exista en la organización `alexmruiz` y que el método de
+análisis del proyecto esté configurado como GitHub Actions (no Automatic Analysis).
+El análisis se omite en pull requests procedentes de forks porque GitHub no entrega
+secretos a esos workflows.
+
+La vinculación compartida para SonarQube for VS Code está en
+`.sonarlint/connectedMode.json`. Cada desarrollador debe crear su propia conexión
+y autenticarse desde la extensión; el archivo compartido no contiene credenciales.
 
 ## Contribuir
 - Sigue el estándar PSR-12 y ejecuta `composer install` + `npm install` antes de contribuir.
