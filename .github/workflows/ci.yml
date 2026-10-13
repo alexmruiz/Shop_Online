@@ -10,6 +10,9 @@ jobs:
   test:
     runs-on: ubuntu-latest
 
+    env:
+      SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+
     services:
       mysql:
         image: mysql:8.0
@@ -23,6 +26,8 @@ jobs:
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
 
     - name: Setup PHP
       uses: shivammathur/setup-php@eb7c497e18156a6bbabfef1d3a82760b9eda3962
@@ -70,3 +75,9 @@ jobs:
         DB_USERNAME: root
         DB_PASSWORD: root
       run: php artisan test
+
+    - name: SonarQube Cloud Analysis
+      if: env.SONAR_TOKEN != '' && (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository)
+      uses: SonarSource/sonarqube-scan-action@d209202bc7d53ff1cc128f7f907dac145c9d6ae9
+      env:
+        SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
