@@ -10,3 +10,5 @@ Artisan::command('inspire', function () {
 use Illuminate\Support\Facades\Schedule;
 
 Schedule::command('app:release-expired-cart-reservations')->everyMinute();
+
+Schedule::command('app:get-currencies')->daily();
