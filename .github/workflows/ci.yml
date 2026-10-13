@@ -10,6 +10,9 @@ jobs:
   test:
     runs-on: ubuntu-latest
 
+    env:
+      SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+
     services:
       mysql:
         image: mysql:8.0
@@ -74,7 +77,7 @@ jobs:
       run: php artisan test
 
     - name: SonarQube Cloud Analysis
-      if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository
+      if: env.SONAR_TOKEN != '' && (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository)
       uses: SonarSource/sonarqube-scan-action@d209202bc7d53ff1cc128f7f907dac145c9d6ae9
       env:
         SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
