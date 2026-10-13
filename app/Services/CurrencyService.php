@@ -10,7 +10,10 @@ use Illuminate\Support\Facades\Http;
 class CurrencyService
 {
 
-    protected string $apiUrl = 'https://api.frankfurter.dev/v2/rates?quotes=usd,gbp,jpy';
+    protected string $apiUrl = 'https://api.frankfurter.dev/v2/rates?quotes='
+        . Currency::GBP->value . ','
+        . Currency::USD->value . ','
+        . Currency::JPY->value;
 
     public function getCurrencyApi(): void
     {
@@ -40,8 +43,8 @@ class CurrencyService
 
     public function getLastCurrencyCache(Currency $currency): ?array
     {
-        return Cache::get($currency->value);
-    }
+        $data = Cache::get($currency->value);
 
- 
+        return ['rate' => $data['rate'], 'date' => $data['date']];
+    }
 }
