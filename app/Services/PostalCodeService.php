@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Support\Facades\Http;
 
 class PostalCodeService
@@ -19,8 +20,8 @@ class PostalCodeService
 
         try {
             $response = Http::connectTimeout(2)->timeout(4)->get($apiUrl);
-        } catch (\Throwable $th) {
-            report($th);
+        } catch (ConnectionException $e) {
+            report($e);
             return [
                 'available' => false,
                 'cities' => [],
