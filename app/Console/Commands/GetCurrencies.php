@@ -26,6 +26,16 @@ class GetCurrencies extends Command
      */
     public function handle(CurrencyService $currency)
     {
-        $currency->getCurrencyApi();
+        $saved = $currency->getCurrencyApi();
+
+        if (!$saved) {
+            $this->error('No se pudieron actualizar los tipos de cambio.');
+
+            return self::FAILURE;
+        }
+
+        $this->info("Actualización correcta.");
+
+        return self::SUCCESS;
     }
 }

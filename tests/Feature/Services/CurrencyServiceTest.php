@@ -48,11 +48,17 @@ class CurrencyServiceTest extends TestCase
 
         $this->service->getCurrencyApi();
 
-        $this->assertSame($rates[0], Cache::get('usd'));
-        $this->assertSame($rates[1], Cache::get('gbp'));
+        $this->assertSame(
+            ['date' => $rates[0]['date'], 'rate' => $rates[0]['rate']],
+            Cache::get('usd'),
+        );
+        $this->assertSame(
+            ['date' => $rates[1]['date'], 'rate' => $rates[1]['rate']],
+            Cache::get('gbp'),
+        );
         Http::assertSent(
-            fn (Request $request): bool => $request->method() === 'GET'
-                && $request->url() === 'https://api.frankfurter.dev/v2/rates?quotes=usd,gbp,jpy'
+            fn(Request $request): bool => $request->method() === 'GET'
+                && $request->url() === 'https://api.frankfurter.dev/v2/rates?quotes=gbp,usd,jpy'
         );
     }
 

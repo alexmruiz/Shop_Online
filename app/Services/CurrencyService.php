@@ -6,6 +6,7 @@ use App\Enums\Currency;
 use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
 
 class CurrencyService
 {
@@ -15,36 +16,54 @@ class CurrencyService
         . Currency::USD->value . ','
         . Currency::JPY->value;
 
-    public function getCurrencyApi(): void
+    public function getCurrencyApi(): bool
     {
         try {
             $response = Http::connectTimeout(2)->timeout(4)->get($this->apiUrl);
         } catch (ConnectionException $e) {
             report($e);
-            return;
+            return false;
         }
 
-        if (!$response->successful()) {
-            return;
+        $currencies = $response->json();
+
+        if (!$response->successful() || !is_array($currencies)) {
+            Log::warning(!$response->successful()
+                ? 'La api respondió con error' . $response->status()
+                : 'La respuesta de la API no tiene el formato esperado.');
+            return false;
         }
 
-        $this->saveCurrency($response->json());
+        $count = $this->saveCurrency($currencies);
+
+        return $count == 3;
     }
 
-    public function saveCurrency(array $currencies): void
+    public function saveCurrency(array $currencies): int
     {
-        if (!empty($currencies)) {
-            foreach ($currencies as $quote) {
+        $saved = 0;
+        if (is_array($currencies)) {
+            foreach ($currencies as $item) {
 
-                Cache::put($quote['quote'], $quote, now()->addDays(7));
+                if (
+                    !isset($item['quote'], $item['date'], $item['rate'])
+                    || !is_string($item['quote'])
+                    || $item['quote'] === ''
+                    || !is_numeric($item['rate'])
+                    || (float) $item['rate'] <= 0
+                ) {
+                    continue;
+                }
+                Cache::put($item['quote'], ['date' => $item['date'], 'rate' => $item['rate']], now()->addDays(7));
+                Log::info('Tipos de cambio actualizados.', ['saved' => $item]);
+                $saved++;
             }
         }
+        return $saved;
     }
 
     public function getLastCurrencyCache(Currency $currency): ?array
     {
-        $data = Cache::get($currency->value);
-
-        return ['rate' => $data['rate'], 'date' => $data['date']];
+        return Cache::get($currency->value);
     }
 }
