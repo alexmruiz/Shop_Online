@@ -36,7 +36,9 @@ class CurrencyService
 
         $count = $this->saveCurrency($currencies);
 
-        return $count == 3;
+        $cases = count(Currency::cases());
+
+        return $count == $cases;
     }
 
     public function saveCurrency(array $currencies): int
@@ -48,7 +50,11 @@ class CurrencyService
                 if (
                     !isset($item['quote'], $item['date'], $item['rate'])
                     || !is_string($item['quote'])
-                    || $item['quote'] === ''
+                    || !in_array($item['quote'], [
+                        Currency::GBP->value,
+                        Currency::USD->value,
+                        Currency::JPY->value,
+                    ], true)
                     || !is_numeric($item['rate'])
                     || (float) $item['rate'] <= 0
                 ) {
