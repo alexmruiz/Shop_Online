@@ -30,16 +30,16 @@ class CurrencyService
             return false;
         }
 
-        $currencies = $response->json();
+        $exchangeRates = $response->json();
 
-        if (!$response->successful() || !is_array($currencies)) {
+        if (!$response->successful() || !is_array($exchangeRates)) {
             Log::warning(!$response->successful()
                 ? 'La api respondió con error' . $response->status()
                 : 'La respuesta de la API no tiene el formato esperado.');
             return false;
         }
 
-        $count = $this->saveCurrency($currencies);
+        $count = $this->saveCurrency($exchangeRates);
 
 
         return $count === 3;
@@ -48,14 +48,14 @@ class CurrencyService
     /**
      * Valida las cotizaciones recibidas y guarda en caché las válidas.
      *
-     * @param array<int, array{date: string, base: string, quote: string, rate: int|float|string}> $currencies
+     * @param array<int, array{date: string, base: string, quote: string, rate: int|float|string}> $exchangeRates
      * @return int Número de cotizaciones guardadas en caché.
      */
-    public function saveCurrency(array $currencies): int
+    public function saveCurrency(array $exchangeRates): int
     {
         $saved = 0;
-        if (is_array($currencies)) {
-            foreach ($currencies as $item) {
+        if (is_array($exchangeRates)) {
+            foreach ($exchangeRates as $item) {
 
                 if (
                     !isset($item['quote'], $item['date'], $item['rate'])
