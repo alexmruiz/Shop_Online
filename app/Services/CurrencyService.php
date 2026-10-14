@@ -58,7 +58,7 @@ class CurrencyService
             foreach ($exchangeRates as $item) {
 
                 if (
-                    !isset($item['quote'], $item['date'], $item['rate'])
+                    !isset($item['quote'], $item['date'], $item['rate'], $item['base'])
                     || !is_string($item['quote'])
                     || !in_array(strtolower($item['quote']), [
                         Currency::GBP->value,
@@ -67,12 +67,12 @@ class CurrencyService
                     ], true)
                     || !is_numeric($item['rate'])
                     || (float) $item['rate'] <= 0
-                    || (strtolower($item['base'])) != Currency::EUR->value
+                    || (strtolower($item['base'])) !== Currency::EUR->value
                 ) {
                     Log::error('No se cumple la validación.', $item);
                     continue;
                 }
-                Cache::put($item['quote'], ['date' => $item['date'], 'rate' => $item['rate']], now()->addDays(7));
+                Cache::put(strtolower($item['quote']), ['date' => $item['date'], 'rate' => $item['rate']], now()->addDays(7));
                 Log::info('Tipos de cambio actualizados.', ['saved' => $item]);
                 $saved++;
             }

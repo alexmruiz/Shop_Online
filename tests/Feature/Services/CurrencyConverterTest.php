@@ -3,8 +3,9 @@
 namespace Tests\Feature\Services;
 
 use App\Enums\Currency;
-use App\Exceptions\KeyNotValid;
-use App\Services\CurrencyConverter;
+use App\Exceptions\CurrencyConverterService\RateNotvailable;
+use App\Services\CurrencyConverterService;
+use App\Services\CurrencyService;
 use Illuminate\Support\Facades\Cache;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
@@ -12,14 +13,17 @@ use Tests\TestCase;
 
 class CurrencyConverterTest extends TestCase
 {
-    private CurrencyConverter $converter;
+    private CurrencyConverterService $converter;
+    private CurrencyService $currencyService;
 
     protected function setUp(): void
     {
         parent::setUp();
 
         Cache::flush();
-        $this->converter = new CurrencyConverter();
+        $this->currencyService = new CurrencyService();
+
+        $this->converter = new CurrencyConverterService($this->currencyService);
     }
 
     #[Test]
@@ -51,7 +55,7 @@ class CurrencyConverterTest extends TestCase
     {
         Cache::put(Currency::USD->value, $quote);
 
-        $this->expectException(KeyNotValid::class);
+        $this->expectException(RateNotvailable::class);
 
         $this->converter->convertFromEur(Currency::USD, '10.00');
     }
