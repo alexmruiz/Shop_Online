@@ -11,6 +11,7 @@
     "require": {
         "php": "^8.2",
         "barryvdh/laravel-dompdf": "^3.0",
+        "brick/math": "^0.12.3",
         "laravel-lang/common": "^6.8",
         "laravel/cashier": "^15.7",
         "laravel/framework": "^11.31",
