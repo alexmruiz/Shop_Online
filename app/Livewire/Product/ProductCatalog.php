@@ -2,12 +2,14 @@
 
 namespace App\Livewire\Product;
 
+use App\Enums\Currency;
 use App\Facades\Cart as CartFacade;
 use App\Models\Category;
 use App\Models\Product;
 use App\Models\User;
 use App\Repositories\ProductRepository;
 use App\Services\CartService;
+use App\Services\CurrencyConverterService;
 use App\Services\ProductService;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
@@ -30,6 +32,7 @@ class ProductCatalog extends Component
     public int $total = 0;
     public ?int $selectedCategory = null;
     public int $countItems = 0;
+    public array $currencies = [];
 
     private ?CartService $cartService = null;
     private ?ProductService $productService = null;
@@ -91,7 +94,7 @@ class ProductCatalog extends Component
     }
 
     #[Layout('components.layouts.app_public')]
-    public function render(ProductRepository $repository, CartService $cartService)
+    public function render(ProductRepository $repository, CartService $cartService, CurrencyConverterService $converter)
     {
         if (!$this->cartService) {
             $this->cartService = $cartService;
@@ -106,6 +109,23 @@ class ProductCatalog extends Component
         foreach ($products as &$product) {
             $total = $product->stock - $product->reserved_stock;
             $product['available_stock'] = $total;
+        }
+
+        $user = Auth::user();
+
+        if ($user) {
+            $currencyUser = $user->currency;
+
+            if ($currencyUser !== Currency::EUR->value) {
+                $products->getCollection()->transform(function (Product $product) use ($converter, $currencyUser) {
+                    $product->price = $converter->convertFromEur(
+                        $currencyUser,
+                        (string) $product->price
+                    );
+                    $product['icon'] = $currencyUser->value;
+                    return $product;
+                });
+            }
         }
 
         $favoriteIds = Auth::check() ? Auth::user()->favoriteProducts()->pluck('products.id')->all() : [];
