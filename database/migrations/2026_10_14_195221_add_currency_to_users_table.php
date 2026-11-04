@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('users', function (Blueprint $table) {
-            $table->string('currency')->nullable(true)->default('eur')->after('role');
+            $table->string('currency')->default('eur')->after('role');
         });
     }
 
