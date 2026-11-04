@@ -87,10 +87,7 @@
                                 </p>
 
                                 <p class="card-text fw-bold text-primary fs-5">
-                                    @php
-                                        $formatPrice = $product->price . ' ' . (isset($product->icon) ? $product->icon : '€');
-                                    @endphp
-                                    {{ $formatPrice }}
+                                    {{ $product->formatPrice }}
                                 </p>
 
                                 {{-- Indicadores de stock --}}

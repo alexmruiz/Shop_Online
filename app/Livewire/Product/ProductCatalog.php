@@ -109,23 +109,7 @@ class ProductCatalog extends Component
         foreach ($products as &$product) {
             $total = $product->stock - $product->reserved_stock;
             $product['available_stock'] = $total;
-        }
-
-        $user = Auth::user();
-
-        if ($user) {
-            $currencyUser = $user->currency;
-
-            if ($currencyUser !== Currency::EUR->value) {
-                $products->getCollection()->transform(function (Product $product) use ($converter, $currencyUser) {
-                    $product->price = $converter->convertFromEur(
-                        $currencyUser,
-                        (string) $product->price
-                    );
-                    $product['icon'] = $currencyUser->value;
-                    return $product;
-                });
-            }
+            $product['formatPrice'] = $converter->convertFromEur(Auth::check() ? Auth::user()->currency : Currency::EUR, $product->price);
         }
 
         $favoriteIds = Auth::check() ? Auth::user()->favoriteProducts()->pluck('products.id')->all() : [];
