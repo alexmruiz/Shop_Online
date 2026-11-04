@@ -3,7 +3,10 @@
 namespace App\Livewire\Cart;
 
 use App\Enums\CartStockActions;
+use App\Enums\Currency;
 use App\Facades\Cart as CartFacade;
+use App\Services\CurrencyConverterService;
+use Illuminate\Support\Facades\Auth;
 use Livewire\Attributes\Layout;
 use Livewire\Attributes\Title;
 use Livewire\Component;
@@ -72,8 +75,16 @@ class CartComponent extends Component
         $this->loadCart();
     }
 
-    public function render()
+    public function render(CurrencyConverterService $converter)
     {
+        $currencyUser = Auth::check() ? Auth::user()->currency : Currency::EUR;
+
+        foreach($this->cartItems as &$item) {
+            $item['formatPrice'] = $converter->convertFromEur($currencyUser, $item['price']);
+        }
+
+        $this->total = $converter->convertFromEur($currencyUser, $this->total);
+
         return view('livewire.cart.cart-component', [
             'cartItems' => $this->cartItems,
             'total' => $this->total,

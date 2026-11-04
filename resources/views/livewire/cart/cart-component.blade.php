@@ -27,7 +27,7 @@
                         <div class="flex-grow-1">
                             <h5 class="mb-1">{{ $item['name'] }}</h5>
                             <small class="text-muted">{{ __('cart.quantity') }}: {{ $item['quantity'] }}</small><br>
-                            <small class="text-muted">{{ __('cart.unit_price') }}: {{ number_format($item['price'], 2) }}€</small><br>
+                            <small class="text-muted">{{ __('cart.unit_price') }}: {{ $item['formatPrice'] }}</small><br>
 
                             @if(!empty($item['reserved_until']))
                             <small
@@ -52,7 +52,7 @@
                 </ul>
 
                 <div class="d-flex justify-content-between align-items-center">
-                    <h3 class="text-lg font-bold">{{ __('cart.total') }}: {{ number_format($total, 2) }}€</h3>
+                    <h3 class="text-lg font-bold">{{ __('cart.total') }}: {{ $total }}</h3>
                     <a href="{{ route('checkout') }}" wire:navigate class="btn btn-primary">
                         <i class="bi bi-credit-card"></i> {{ __('cart.checkout') }}
                     </a>
