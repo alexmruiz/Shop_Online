@@ -3,11 +3,10 @@
 namespace App\Services;
 
 use App\Enums\Currency;
+use App\Exceptions\CurrencyConverterService\CurrencyNotPermitted;
 use App\Exceptions\CurrencyConverterService\RateNotvailable;
 use Brick\Math\BigDecimal;
 use Brick\Math\RoundingMode;
-use Illuminate\Support\Facades\App;
-use Illuminate\Support\Number;
 
 class CurrencyConverterService
 {
@@ -31,7 +30,7 @@ class CurrencyConverterService
         }
 
         if ($currency->value === Currency::EUR->value) {
-            return $this->formatMoney($currency, $price);
+            throw new CurrencyNotPermitted("No es posible convertir la moneda base");
         }
 
         $valueCurrency = $currency->value;
@@ -44,21 +43,8 @@ class CurrencyConverterService
 
         $scale = $currency === Currency::JPY ? 0 : 2;
 
-        $priceCurrency = (string) BigDecimal::of($price)
+        return (string) BigDecimal::of($price)
             ->multipliedBy((string) $quote['rate'])
             ->toScale($scale, RoundingMode::HALF_UP);
-        return $this->formatMoney($currency, $priceCurrency);
-    }
-
-    /**
-     * Undocumented function
-     *
-     * @param Currency $currency
-     * @param string $price
-     * @return string
-     */
-    public function formatMoney(Currency $currency, string $price): string
-    {
-        return Number::currency($price, in: strtoupper($currency->value), locale:App::getLocale());
     }
 }
