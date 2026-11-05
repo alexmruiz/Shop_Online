@@ -14,7 +14,7 @@
                 </div>
                 @else
                 <ul class="list-group mb-4">
-                    @foreach ($cartItems as $item)
+                    @foreach ($cartItemsFormat as $item)
                     <li class="list-group-item d-flex align-items-center" wire:key="cart-item-{{ $item['id'] }}">
                         @php
                         $product = \App\Models\Product::find($item['product_id']);
@@ -52,7 +52,7 @@
                 </ul>
 
                 <div class="d-flex justify-content-between align-items-center">
-                    <h3 class="text-lg font-bold">{{ __('cart.total') }}: {{ $total }}</h3>
+                    <h3 class="text-lg font-bold">{{ __('cart.total') }}: {{ $totalFormat }}</h3>
                     <a href="{{ route('checkout') }}" wire:navigate class="btn btn-primary">
                         <i class="bi bi-credit-card"></i> {{ __('cart.checkout') }}
                     </a>

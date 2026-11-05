@@ -6,6 +6,7 @@ use App\Enums\CartStockActions;
 use App\Enums\Currency;
 use App\Facades\Cart as CartFacade;
 use App\Services\CurrencyConverterService;
+use App\Services\CurrencyFormatService;
 use Illuminate\Support\Facades\Auth;
 use Livewire\Attributes\Layout;
 use Livewire\Attributes\Title;
@@ -75,19 +76,29 @@ class CartComponent extends Component
         $this->loadCart();
     }
 
-    public function render(CurrencyConverterService $converter)
+    public function render(CurrencyConverterService $converter, CurrencyFormatService $format)
     {
         $currencyUser = Auth::check() ? Auth::user()->currency : Currency::EUR;
 
-        foreach($this->cartItems as &$item) {
-            $item['formatPrice'] = $converter->convertFromEur($currencyUser, $item['price']);
+        $cartItemsFormat = $this->cartItems;
+
+        foreach($cartItemsFormat as &$item) {
+            if ($currencyUser !== Currency::EUR) {
+                $priceFormat = $converter->convertFromEur($currencyUser, $item['price']);
+
+                $item['formatPrice'] = $format->formatMoney($currencyUser, $priceFormat);
+            }else {
+                $item['formatPrice'] = $format->formatMoney($currencyUser, $item['price']);
+            }
         }
 
-        $this->total = $converter->convertFromEur($currencyUser, $this->total);
+        $totalConvert = $currencyUser !== Currency::EUR ? $converter->convertFromEur($currencyUser, $this->total) : $this->total;
+        
+        $totalFormat = $format->formatMoney($currencyUser, $totalConvert);
 
         return view('livewire.cart.cart-component', [
-            'cartItems' => $this->cartItems,
-            'total' => $this->total,
+            'cartItemsFormat' => $cartItemsFormat,
+            'totalFormat' => $totalFormat,
         ]);
     }
 }
