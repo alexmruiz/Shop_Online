@@ -2,12 +2,15 @@
 
 namespace App\Livewire\Product;
 
+use App\Enums\Currency;
 use App\Facades\Cart as CartFacade;
 use App\Models\Category;
 use App\Models\Product;
 use App\Models\User;
 use App\Repositories\ProductRepository;
 use App\Services\CartService;
+use App\Services\CurrencyConverterService;
+use App\Services\CurrencyFormatService;
 use App\Services\ProductService;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
@@ -30,6 +33,7 @@ class ProductCatalog extends Component
     public int $total = 0;
     public ?int $selectedCategory = null;
     public int $countItems = 0;
+    public array $currencies = [];
 
     private ?CartService $cartService = null;
     private ?ProductService $productService = null;
@@ -90,8 +94,9 @@ class ProductCatalog extends Component
         $this->total = $cartData['total'];
     }
 
+
     #[Layout('components.layouts.app_public')]
-    public function render(ProductRepository $repository, CartService $cartService)
+    public function render(ProductRepository $repository, CartService $cartService, CurrencyConverterService $converter, CurrencyFormatService $format)
     {
         if (!$this->cartService) {
             $this->cartService = $cartService;
@@ -103,11 +108,22 @@ class ProductCatalog extends Component
             $this->cant
         );
 
-        foreach ($products as &$product) {
-            $total = $product->stock - $product->reserved_stock;
-            $product['available_stock'] = $total;
-        }
+        $currency = Auth::user()?->currency ?? Currency::EUR;
 
+        $products->getCollection()->transform(
+            function (Product $product) use ($currency, $converter, $format): Product {
+                $product->available_stock = $product->stock - $product->reserved_stock;
+
+                $amount = $currency === Currency::EUR
+                    ? (string) $product->price
+                    : $converter->convertFromEur($currency, (string) $product->price);
+
+                $product->formatPrice = $format->formatMoney($currency, $amount);
+
+                return $product;
+            }
+        );
+        
         $favoriteIds = Auth::check() ? Auth::user()->favoriteProducts()->pluck('products.id')->all() : [];
 
         $cart = Auth::user() ? $this->cartService->getOrCreatePendingCart() : null;

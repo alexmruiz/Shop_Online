@@ -86,7 +86,9 @@
                                     {{ Str::limit($product->description, 100, '...') }}
                                 </p>
 
-                                <p class="card-text fw-bold text-primary fs-5">{{ number_format($product->price, 2) }} €</p>
+                                <p class="card-text fw-bold text-primary fs-5">
+                                    {{ $product->formatPrice }}
+                                </p>
 
                                 {{-- Indicadores de stock --}}
                                 @if ($product['available_stock'] > 0 && $product['available_stock'] <= 5)
