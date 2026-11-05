@@ -11,7 +11,7 @@ use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
 use Tests\TestCase;
 
-class CurrencyConverterTest extends TestCase
+class CurrencyConverterServiceTest extends TestCase
 {
     private CurrencyConverterService $converter;
     private CurrencyService $currencyService;
