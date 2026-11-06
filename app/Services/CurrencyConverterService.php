@@ -25,12 +25,21 @@ class CurrencyConverterService
      */
     public function convertFromEur(Currency $currency, string $price): ?string
     {
-        if (empty($price)) {
+        $price = trim($price);
+
+        if ($price === '') {
             return null;
         }
 
         if ($currency->value === Currency::EUR->value) {
             throw new CurrencyNotPermitted("No es posible convertir la moneda base");
+        }
+
+        $scale = $currency === Currency::JPY ? 0 : 2;
+        $amount = BigDecimal::of($price);
+
+        if ($amount->isZero()) {
+            return (string) $amount->toScale($scale, RoundingMode::HALF_UP);
         }
 
         $valueCurrency = $currency->value;
@@ -41,9 +50,7 @@ class CurrencyConverterService
             throw new RateNotvailable(self::INVALID_CACHED_RATE_MESSAGE . $valueCurrency);
         }
 
-        $scale = $currency === Currency::JPY ? 0 : 2;
-
-        return (string) BigDecimal::of($price)
+        return (string) $amount
             ->multipliedBy((string) $quote['rate'])
             ->toScale($scale, RoundingMode::HALF_UP);
     }
