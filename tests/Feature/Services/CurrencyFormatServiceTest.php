@@ -3,10 +3,8 @@
 namespace Tests\Feature\Services;
 
 use App\Enums\Currency;
-use App\Models\User;
 use App\Services\CurrencyFormatService;
 use Illuminate\Support\Facades\App;
-use Illuminate\Support\Facades\Auth;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
 use Tests\TestCase;
@@ -15,13 +13,11 @@ class CurrencyFormatServiceTest extends TestCase
 {
     #[Test]
     #[DataProvider('currencyFormats')]
-    public function it_formats_amounts_using_the_authenticated_users_language(
+    public function it_formats_amounts_using_the_application_locale(
         Currency $currency,
         string $expected,
     ): void {
-        $user = new User;
-        $user->lang = 'es';
-        $this->actingAs($user);
+        App::setLocale('es');
 
         $service = new CurrencyFormatService;
 
@@ -39,9 +35,8 @@ class CurrencyFormatServiceTest extends TestCase
     }
 
     #[Test]
-    public function it_uses_the_application_locale_for_guests(): void
+    public function it_formats_amounts_using_the_english_locale(): void
     {
-        Auth::logout();
         App::setLocale('en');
 
         $service = new CurrencyFormatService;

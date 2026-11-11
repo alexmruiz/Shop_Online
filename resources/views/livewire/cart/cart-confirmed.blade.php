@@ -9,28 +9,21 @@
             <!-- Detalles del Pedido -->
             <h5 class="mt-4">Detalles del Pedido</h5>
             <ul class="list-group">
-                @php $total = 0; @endphp
-                @foreach ($cart->cartItems as $item)
+                @foreach ($cartItemsFormat as $item)
                     <li class="list-group-item d-flex align-items-center">
                         <div class="flex-shrink-0">
-                            @php
-                                $product = \App\Models\Product::find($item->product_id);
-                            @endphp
-                            @if($product) 
-                                <x-image-product :product="$product" class="img-thumbnail me-3" /> 
+                            @if($item->product)
+                                <x-image-product :product="$item->product" class="img-thumbnail me-3" />
                             @endif
                         </div>
                         <div class="flex-grow-1">
                             <h6 class="mb-1">{{ $item->product->name }}</h6>
                             <p class="mb-0">
                                 {{ $item->quantity }} unidades - 
-                                <strong>{{ number_format($item->unit_price * $item->quantity, 2) }} €</strong>
+                                <strong>{{ $item->formatPrice }}</strong>
                             </p>
                         </div>
                     </li>
-                    @php
-                        $total += $item->unit_price * $item->quantity;
-                    @endphp
                 @endforeach
             </ul>
 
@@ -39,7 +32,7 @@
             <!-- Total de la compra -->
             <h5 class="mt-4">Total de la Compra</h5>
             <p class="text-end">
-                <strong>{{ number_format($total, 2) }} €</strong>
+                <strong>{{ $totalFormat }}</strong>
             </p>
 
             <hr>

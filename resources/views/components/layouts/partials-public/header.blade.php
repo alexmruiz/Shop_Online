@@ -29,6 +29,8 @@
                 </ul>
 
                 <div class="d-flex align-items-center gap-3">
+                    <livewire:header.select-currency />
+
                     <!-- Selector de idioma -->
                     <div class="dropdown">
                         <a class="btn btn-light dropdown-toggle" href="#" role="button" id="langMenu" data-bs-toggle="dropdown" aria-expanded="false">

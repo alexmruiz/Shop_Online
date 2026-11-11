@@ -16,6 +16,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
 use Livewire\Attributes\Computed;
 use Livewire\Attributes\Layout;
+use Livewire\Attributes\On;
 use Livewire\Attributes\Title;
 use Livewire\Component;
 use Livewire\WithPagination;
@@ -38,6 +39,8 @@ class ProductCatalog extends Component
     private ?CartService $cartService = null;
     private ?ProductService $productService = null;
 
+    public string $currencyUser = Currency::EUR->value;
+
 
     #[Computed()] // Obtiene todas las categorías
     public function categories()
@@ -59,6 +62,8 @@ class ProductCatalog extends Component
         if (Product::count() === 0) {
             $this->productService->importProducts();
         }
+
+        $this->currencyUser = Auth::user()?->currency->value ?? Currency::EUR->value;
     }
 
     /**
@@ -108,7 +113,7 @@ class ProductCatalog extends Component
             $this->cant
         );
 
-        $currency = Auth::user()?->currency ?? Currency::EUR;
+        $currency = Currency::from($this->currencyUser);
 
         $products->getCollection()->transform(
             function (Product $product) use ($currency, $converter, $format): Product {
@@ -154,5 +159,11 @@ class ProductCatalog extends Component
         $product = Product::findOrFail($productId);
 
         $user->favoriteProducts()->toggle($product->id);
+    }
+
+    #[On('currencyuser-updated')]
+    public function listenCurrencyUser(string $currency)
+    {
+        $this->currencyUser = Currency::from($currency)->value;
     }
 }

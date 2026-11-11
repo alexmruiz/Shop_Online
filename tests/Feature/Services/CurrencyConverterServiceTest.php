@@ -14,6 +14,7 @@ use Tests\TestCase;
 class CurrencyConverterServiceTest extends TestCase
 {
     private CurrencyConverterService $converter;
+
     private CurrencyService $currencyService;
 
     protected function setUp(): void
@@ -21,7 +22,7 @@ class CurrencyConverterServiceTest extends TestCase
         parent::setUp();
 
         Cache::flush();
-        $this->currencyService = new CurrencyService();
+        $this->currencyService = new CurrencyService;
 
         $this->converter = new CurrencyConverterService($this->currencyService);
     }
@@ -46,6 +47,24 @@ class CurrencyConverterServiceTest extends TestCase
             'USD uses two decimal places' => [Currency::USD, '1.1202', '11.20'],
             'GBP uses two decimal places' => [Currency::GBP, '0.84534', '8.45'],
             'JPY rounds to whole yen' => [Currency::JPY, '177.46', '1775'],
+        ];
+    }
+
+    #[Test]
+    #[DataProvider('zeroAmountConversions')]
+    public function it_converts_zero_without_an_exchange_rate(
+        Currency $currency,
+        string $expected,
+    ): void {
+        $this->assertSame($expected, $this->converter->convertFromEur($currency, '0'));
+    }
+
+    public static function zeroAmountConversions(): array
+    {
+        return [
+            'zero USD' => [Currency::USD, '0.00'],
+            'zero GBP' => [Currency::GBP, '0.00'],
+            'zero JPY' => [Currency::JPY, '0'],
         ];
     }
 
