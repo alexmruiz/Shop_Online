@@ -2,8 +2,12 @@
 
 namespace App\Livewire\Product;
 
+use App\Enums\Currency;
+use App\Services\CurrencyConverterService;
+use App\Services\CurrencyFormatService;
 use Illuminate\Support\Facades\Auth;
 use Livewire\Attributes\Layout;
+use Livewire\Attributes\On;
 use Livewire\Attributes\Title;
 use Livewire\Component;
 use Livewire\WithPagination;
@@ -15,9 +19,12 @@ class FavoriteProducts extends Component
 
     protected $paginationTheme = 'bootstrap';
 
+    public string $currencyUser = Currency::EUR->value;
+
     public function mount()
     {
-      $this->dispatch('update-breadcrumbs', [
+        $this->currencyUser = Auth::user()?->currency?->value ?? Currency::EUR->value;
+        $this->dispatch('update-breadcrumbs', [
             ['name' => 'Home', 'url' => route('home')],
             ['name' => 'Favoritos', 'url' => null],
         ]);
@@ -29,16 +36,37 @@ class FavoriteProducts extends Component
     }
 
     #[Layout('components.layouts.app_public')]
-    public function render()
-    {
-        $products =  Auth::user()->favoriteProducts()->latest('favorite_products.created_at')->paginate(12);
-        foreach ($products as &$product) {
-            $total = $product->stock - $product->reserved_stock;
-            $product['available_stock'] = $total;
-        }
+    public function render(
+        CurrencyConverterService $converter,
+        CurrencyFormatService $format
+    ) {
+        $products = Auth::user()
+            ->favoriteProducts()
+            ->latest('favorite_products.created_at')
+            ->paginate(12);
+
+        $currency = Currency::from($this->currencyUser);
+
+        $products->getCollection()->transform(function ($product) use ($currency, $converter, $format) {
+            $product->available_stock = $product->stock - $product->reserved_stock;
+
+            $amount = $currency === Currency::EUR
+                ? (string) $product->price
+                : $converter->convertFromEur($currency, (string) $product->price);
+
+            $product->formatPrice = $format->formatMoney($currency, $amount);
+
+            return $product;
+        });
 
         return view('livewire.product.favorite-products', [
             'products' => $products,
         ]);
+    }
+
+    #[On('currencyuser-updated')]
+    public function listenCurrencyUser(string $currency)
+    {
+        $this->currencyUser = Currency::from($currency)->value;
     }
 }
