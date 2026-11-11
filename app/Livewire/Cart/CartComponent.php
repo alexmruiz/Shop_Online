@@ -9,6 +9,7 @@ use App\Services\CurrencyConverterService;
 use App\Services\CurrencyFormatService;
 use Illuminate\Support\Facades\Auth;
 use Livewire\Attributes\Layout;
+use Livewire\Attributes\On;
 use Livewire\Attributes\Title;
 use Livewire\Component;
 
@@ -19,8 +20,9 @@ use Livewire\Component;
 #[Title("Cesta de la compra")]
 class CartComponent extends Component
 {
-    public $cartItems = [];
-    public $total = 0;
+    public array $cartItems = [];
+    public int $total = 0;
+    public string $currencyUser = Currency::EUR->value;
 
     #[Layout('components.layouts.app_public')]
     public function mount()
@@ -30,6 +32,9 @@ class CartComponent extends Component
             ['name' => 'Home', 'url' => route('home')],
             ['name' => 'Cesta de la compra', 'url' => null],
         ]);
+
+        $this->currencyUser = Auth::user()?->currency->value ?? Currency::EUR->value;
+
     }
 
     /**
@@ -76,12 +81,8 @@ class CartComponent extends Component
         $this->loadCart();
     }
 
-    public function render(CurrencyConverterService $converter, CurrencyFormatService $format)
+    public function transformCash(array $cartItemsFormat, Currency $currencyUser, CurrencyFormatService $format, CurrencyConverterService $converter): array
     {
-        $currencyUser = Auth::check() ? Auth::user()->currency : Currency::EUR;
-
-        $cartItemsFormat = $this->cartItems;
-
         foreach($cartItemsFormat as &$item) {
             if ($currencyUser !== Currency::EUR) {
                 $priceFormat = $converter->convertFromEur($currencyUser, $item['price']);
@@ -92,13 +93,30 @@ class CartComponent extends Component
             }
         }
 
-        $totalConvert = $currencyUser !== Currency::EUR ? $converter->convertFromEur($currencyUser, $this->total) : $this->total;
+        return $cartItemsFormat;
+    }
+
+    public function render(CurrencyConverterService $converter, CurrencyFormatService $format)
+    {
+        $cartItemsFormat = $this->cartItems;
+
+        $currencyUserToEnum = Currency::from($this->currencyUser);
+
+        $cartItemsFormat = $this->transformCash($cartItemsFormat, $currencyUserToEnum, $format, $converter);
+
+        $totalConvert = $currencyUserToEnum !== Currency::EUR ? $converter->convertFromEur($currencyUserToEnum, $this->total) : $this->total;
         
-        $totalFormat = $format->formatMoney($currencyUser, $totalConvert);
+        $totalFormat = $format->formatMoney($currencyUserToEnum, $totalConvert);
 
         return view('livewire.cart.cart-component', [
             'cartItemsFormat' => $cartItemsFormat,
             'totalFormat' => $totalFormat,
         ]);
+    }
+
+    #[On('currencyuser-updated')]
+    public function listenCurrencyUser(string $currency)
+    {
+        $this->currencyUser = Currency::from($currency)->value;
     }
 }
